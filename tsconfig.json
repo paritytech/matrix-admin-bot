@@ -1,18 +1,26 @@
 {
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "target": "es2015",
-        "noImplicitAny": false,
-        "sourceMap": true,
-        "outDir": "./lib",
-        "types": [
-            "node"
-        ]
-    },
-    "include": [
-        "./src/**/*"
-    ]
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "build",
+    "sourceMap": false,
+    "declaration": false,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "ES2021", // Node.js LTS 16
+    "lib": ["ES2021"], // Node.js LTS 16
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "useUnknownInCatchVariables": false,
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src"],
+    "jsx": "preserve",
+    "resolveJsonModule": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
