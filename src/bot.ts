@@ -12,6 +12,7 @@ import config from "./config/env"
 import CommandHandler from "./handler"
 
 // First things first: let's make the logs a bit prettier.
+// TODO: replace with https://github.com/paritytech/opstooling-js/blob/master/src/logger.ts
 LogService.setLogger(new RichConsoleLogger())
 
 LogService.setLevel(LogLevel.DEBUG)
