@@ -36,12 +36,15 @@ export async function runInviteCommand(
   }
 
   if (groups?.length && groups.includes(roomsGroupSeparator)) {
-    rooms = groups.split(roomsGroupSeparator).reduce((acc, group) => {
-      if (group in RoomGroups && groupedRooms[group]?.length) {
-        acc.push(...groupedRooms[group])
-      }
-      return acc
-    }, [] as string[])
+    rooms = groups
+      .trim()
+      .split(roomsGroupSeparator)
+      .reduce((acc, group) => {
+        if (group in RoomGroups && groupedRooms[group]?.length) {
+          acc.push(...groupedRooms[group])
+        }
+        return acc
+      }, [] as string[])
   } else {
     // if no groups, just do invite in most common rooms
     defaultGroup.forEach((group) => {

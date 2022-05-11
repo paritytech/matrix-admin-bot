@@ -19,7 +19,7 @@
     "build": "tsc",
     "eslint": "eslint",
     "lint": "yarn eslint && yarn typecheck && prettier",
-    "dev": "nodemon -- ./src/bot.ts",
+    "dev": "nodemon -- src/main.ts",
     "typecheck": "tsc --noEmit",
     "fix:eslint": "eslint --fix",
     "fix:prettier": "prettier --write",

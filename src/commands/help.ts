@@ -7,9 +7,9 @@ import {
 } from "matrix-bot-sdk"
 
 // eslint-disable-next-line no-restricted-imports
-import { RoomGroups } from "../config/rooms"
+import { commandPrefix } from "../bot"
 // eslint-disable-next-line no-restricted-imports
-import { commandPrefix } from "../handler"
+import { RoomGroups } from "../config/rooms"
 import { defaultGroup, roomsGroupSeparator } from "./invite"
 
 export async function runHelpCommand(
