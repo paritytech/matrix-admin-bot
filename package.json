@@ -30,7 +30,8 @@
     "escape-html": "^1.0.3",
     "joi": "^17.6.0",
     "js-yaml": "^4.1.0",
-    "matrix-bot-sdk": "^0.5.19"
+    "matrix-bot-sdk": "^0.5.19",
+    "tsconfig-paths": "^4.0.0"
   },
   "devDependencies": {
     "@resolritter/tsc-files": "^1.1.4",

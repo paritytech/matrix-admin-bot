@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": ".",
     "outDir": "build",
     "sourceMap": false,
     "declaration": false,
@@ -17,10 +17,10 @@
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false,
     "types": ["node"],
-    "typeRoots": ["./node_modules/@types", "./src"],
-    "jsx": "preserve",
-    "resolveJsonModule": true
+    "typeRoots": ["./node_modules/@types", "./src"]
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }

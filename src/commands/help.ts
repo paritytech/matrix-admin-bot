@@ -6,10 +6,9 @@ import {
   RichReply,
 } from "matrix-bot-sdk"
 
-// eslint-disable-next-line no-restricted-imports
-import { commandPrefix } from "../bot"
-// eslint-disable-next-line no-restricted-imports
-import { RoomGroups } from "../config/rooms"
+import { commandPrefix } from "src/bot"
+import { RoomGroups } from "src/config/rooms"
+
 import { defaultGroup, roomsGroupSeparator } from "./invite"
 
 export async function runHelpCommand(
@@ -21,19 +20,19 @@ export async function runHelpCommand(
   const defaultRoomGroups =
     Object.values(defaultGroup).join(roomsGroupSeparator)
   const help = `
-${commandPrefix} invite <userId> [<group>] 
-    Invite user to a group of rooms. 
+${commandPrefix} invite <userId> [<group>]
+    Invite user to a group of rooms.
     <userId>    - Matrix user id @username:matrix.parity.io
     [<group>]   - (Optional) group(s) of channels to invite user
                 Available groups: ${allRoomGroups}
                 Default: ${defaultRoomGroups}
                 Groups with rooms are defined here: https://github.com/paritytech/matrix-admin-bot/tree/master/src/config/rooms.ts
-    
-    Examples: 
-    - "${commandPrefix} invite @username:matrix.parity.io" - invite user to default ${allRoomGroups} 
+
+    Examples:
+    - "${commandPrefix} invite @username:matrix.parity.io" - invite user to default ${allRoomGroups}
     - "${commandPrefix} invite @username:matrix.parity.io common|opstooling" - custom groups
 
-${commandPrefix} help        
+${commandPrefix} help
     This menu
         `
 

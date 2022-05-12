@@ -6,10 +6,8 @@ import {
 } from "matrix-bot-sdk"
 import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
-// eslint-disable-next-line no-restricted-imports
-import { groupedRooms, RoomGroups } from "../config/rooms"
-// eslint-disable-next-line no-restricted-imports
-import { sleep } from "../utils"
+import { groupedRooms, RoomGroups } from "src/config/rooms"
+import { sleep } from "src/utils"
 
 const moduleName = "InviteCommand"
 export const roomsGroupSeparator = "|"
