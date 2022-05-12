@@ -1,6 +1,6 @@
 {
   "verbose": false,
-  "watch": ["./src"],
+  "watch": ["./src", ".env"],
   "ext": ".ts",
   "exec": "node -r ts-node/register -r dotenv/config"
 }
