@@ -8,6 +8,7 @@ import {
 
 import { runHelpCommand } from "./commands/help"
 import { runInviteCommand } from "./commands/invite"
+import { CommandError } from "./utils"
 
 /* The prefix required to trigger the bot. The bot will also respond
    to being pinged directly. */
@@ -84,15 +85,18 @@ export default class Bot {
         return await runHelpCommand(roomId, event, this.client)
       }
     } catch (e) {
-      const error: string | object = (e?.body?.error as string) || (e as object)
+      let replyMessage: string = "There was an error processing your command"
+
+      if (e instanceof CommandError) {
+        replyMessage = e.message
+      } else if (typeof e?.body?.error === "string") {
+        replyMessage = e.body.error as string
+      }
+
       // Log the error
-      LogService.error("CommandHandler", error)
+      LogService.error("CommandHandler", e)
 
       // Tell the user there was a problem
-      const replyMessage =
-        typeof error === "string"
-          ? error
-          : "There was an error processing your command"
       return this.client.replyNotice(roomId, ev, replyMessage)
     }
   }

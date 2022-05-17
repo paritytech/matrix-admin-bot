@@ -7,53 +7,92 @@ import {
 import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
 import { groupedRooms, RoomGroups } from "src/config/rooms"
-import { sleep } from "src/utils"
+import { CommandError, sleep } from "src/utils"
 
 const moduleName = "InviteCommand"
-export const roomsGroupSeparator = "|"
-export const defaultGroup = [RoomGroups.common, RoomGroups.engineering]
+export const defaultGroups = [RoomGroups.common, RoomGroups.engineering]
+
+type InviteReport = { succeedInviteCount: number; failedInvites: string[] }
+type RoomsList = string[]
 
 export async function runInviteCommand(
   roomId: string,
   event: MessageEvent<MessageEventContent>,
   args: string[],
   client: MatrixClient,
-) {
-  const [, userId, groups] = args
-  let rooms: string[] = []
-  const report: { succeedInviteCount: number; failedInvites: string[] } = {
-    failedInvites: [],
-    succeedInviteCount: 0,
+): Promise<string> {
+  const [, userId, ...userGroups] = args
+  const groups: string[] = userGroups?.length ? userGroups : defaultGroups
+  const username: string = await getUserDisplayName(client, userId)
+  const rooms: RoomsList = getRoomsByGroups(groups)
+  await sendMessage(
+    client,
+    roomId,
+    `Started sending invites of ${username} to ${groups.join(", ")} groups`,
+  )
+  const report: InviteReport = await inviteUserToRooms(client, rooms, userId)
+
+  let resultMessage = `Added ${username} to ${report.succeedInviteCount}/${rooms.length} rooms`
+
+  if (report.failedInvites.length) {
+    resultMessage +=
+      "\n\nFailed invites:\n" + report.failedInvites.join("\n") + "\nDone!"
+    LogService.error(moduleName, resultMessage)
+  } else {
+    resultMessage += " 🎉"
   }
-  const user: MatrixProfileInfo = (await client.getUserProfile(
-    userId,
-  )) as MatrixProfileInfo
+
+  // Now send that message as a notice (along with failed invite messages, if there are).
+  return sendMessage(client, roomId, resultMessage)
+}
+
+function getRoomsByGroups(groups: string[]): RoomsList {
+  const roomsSet = new Set<string>()
+
+  // see if some wrong groups used
+  const wrongGroups = groups.filter((group) => {
+    return !Object.keys(RoomGroups).includes(group)
+  })
+
+  // stop execution, so user has a chance to fix (if it was a typo)
+  if (wrongGroups?.length) {
+    throw new CommandError(`Groups "${wrongGroups.join(", ")}" were not found`)
+  }
+
+  // add each group of rooms to set, so the merged list is unique
+  groups.forEach((group) => {
+    groupedRooms[group].forEach((rooms) => {
+      roomsSet.add(rooms)
+    })
+  })
+
+  return [...roomsSet]
+}
+
+async function getUserDisplayName(
+  client: MatrixClient,
+  userId: string,
+): Promise<string> {
+  const user = (await client.getUserProfile(userId)) as MatrixProfileInfo
 
   if (!user.displayname) {
-    throw new Error(`Can not find the user "${userId}"`)
+    throw new CommandError(`Can not find the user "${userId}"`)
   }
 
-  if (groups?.length && groups.includes(roomsGroupSeparator)) {
-    rooms = groups
-      .trim()
-      .split(roomsGroupSeparator)
-      .reduce((acc, group) => {
-        if (group in RoomGroups && groupedRooms[group]?.length) {
-          acc.push(...groupedRooms[group])
-        }
-        return acc
-      }, [] as string[])
-  } else {
-    // if no groups, just do invite in most common rooms
-    defaultGroup.forEach((group) => {
-      rooms.push(...groupedRooms[group])
-    })
-  }
+  return user.displayname
+}
+
+async function inviteUserToRooms(
+  client: MatrixClient,
+  rooms: RoomsList,
+  userId: string,
+): Promise<InviteReport> {
+  const report: InviteReport = { failedInvites: [], succeedInviteCount: 0 }
 
   for (const inviteToRoomId of rooms) {
     let room: { name?: string } = {}
 
-    // check if room exists. Also we'll use its name
+    // check if room exists. Also, we'll use its name
     try {
       room = (await client.getRoomStateEvent(
         inviteToRoomId,
@@ -85,18 +124,13 @@ export async function runInviteCommand(
     await sleep(300)
   }
 
-  let resultMessage = `Added ${user.displayname} to ${report.succeedInviteCount}/${rooms.length} rooms`
+  return report
+}
 
-  if (report.failedInvites.length) {
-    resultMessage += "\n👎 Failed invites:\n" + report.failedInvites.join("\n")
-    LogService.error(moduleName, resultMessage)
-  } else {
-    resultMessage += " 🎉"
-  }
-
-  // Now send that message as a notice (along with failed invite messages, if there are).
-  return client.sendMessage(roomId, {
-    body: resultMessage,
-    msgtype: "m.notice",
-  })
+function sendMessage(
+  client: MatrixClient,
+  roomId: string,
+  message: string,
+): Promise<string> {
+  return client.sendMessage(roomId, { body: message, msgtype: "m.notice" })
 }
