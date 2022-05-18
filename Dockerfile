@@ -1,22 +1,11 @@
-FROM node:14 AS builder
+FROM docker.io/library/node:16.10-alpine
 
-WORKDIR /src
-COPY . /src
+WORKDIR /
+COPY . .
 
-RUN npm ci
-RUN npm run build
-
-FROM node:14
+RUN yarn --immutable
+RUN yarn build
 
 ENV NODE_ENV=production
-WORKDIR /bot
 
-COPY --from=builder /src/lib /bot/lib
-COPY --from=builder /src/package*.json /bot
-COPY --from=builder /src/config /bot/config
-
-RUN npm ci
-
-VOLUME /bot/config
-
-CMD ["node", "lib/index.js"]
+CMD ["node", "build/bot.js"]
