@@ -2568,7 +2568,7 @@ once@^1.3.0, once@^1.3.1, once@^1.4.0:
 
 "opstooling-js-style@https://github.com/paritytech/opstooling-js-style#master":
   version "0.0.0"
-  resolved "https://github.com/paritytech/opstooling-js-style#9b81c6cd3c3f2c765c8fcab0d23268ebd2287aa9"
+  resolved "https://github.com/paritytech/opstooling-js-style#0057b010b0745fb5aeec8a9e448045ec27e25f57"
   dependencies:
     "@typescript-eslint/eslint-plugin" "^5.21.0"
     "@typescript-eslint/parser" "^5.21.0"

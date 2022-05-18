@@ -43,7 +43,7 @@ export async function runInviteCommand(
   }
 
   // Now send that message as a notice (along with failed invite messages, if there are).
-  return sendMessage(client, roomId, resultMessage)
+  return await sendMessage(client, roomId, resultMessage)
 }
 
 function getRoomsByGroups(groups: string[]): RoomsList {

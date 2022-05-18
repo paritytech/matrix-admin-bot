@@ -4,7 +4,7 @@ export enum RoomGroups {
   infra = "infra",
 }
 
-/* eslint-disable */
+/* eslint-disable prettier/prettier, no-multi-spaces */
 export const groupedRooms: { [k: string]: string[] } = {
   [RoomGroups.common]: [
     '!DsFdtakbJIgTjrIEzf:matrix.parity.io', // Parity Liedown
@@ -24,7 +24,7 @@ export const groupedRooms: { [k: string]: string[] } = {
     '!rOvpVjZCuxwdGDoiZs:matrix.parity.io', // Parity Berlin Office
     '!aenJixaHcSKbJOWxYk:matrix.parity.io', // Substrate
     '!qoanQXLalRnFLPuvtV:matrix.parity.io', // Engineering Updates
-    // // temporary
+    // temporary
     '!TMIbnEhhKugsxnFEZD:matrix.parity.io', // Company Retreat 2022
   ],
   [RoomGroups.engineering]: [

@@ -15,7 +15,7 @@ export async function runHelpCommand(
   roomId: string,
   event: MessageEvent<MessageEventContent>,
   client: MatrixClient,
-) {
+): Promise<string> {
   const allRoomGroups = Object.keys(RoomGroups).join(", ")
   const defaultRoomGroups = Object.values(defaultGroups).join(", ")
   const help = `
@@ -44,5 +44,5 @@ ${commandPrefix} help
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const reply = RichReply.createFor(roomId, event, text, html)
   reply.msgtype = "m.notice" // Bots should always use notices
-  return client.sendMessage(roomId, reply)
+  return await client.sendMessage(roomId, reply)
 }

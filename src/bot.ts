@@ -24,7 +24,7 @@ export default class Bot {
 
   constructor(private client: MatrixClient) {}
 
-  public async start() {
+  public async start(): Promise<void> {
     // Populate the variables above (async)
     await this.prepareProfile()
 
@@ -73,7 +73,13 @@ export default class Bot {
     if (!prefixUsed) return // Not a command (as far as we're concerned)
 
     // Check to see what the arguments were to the command
-    const args = event.textBody.substring(prefixUsed.length).trim().split(" ")
+    const args = event.textBody
+      .substring(prefixUsed.length)
+      .trim()
+      .split(" ")
+      .filter((arg) => {
+        return arg.trim().length !== 0
+      })
 
     LogService.info(`Got a new command: ${args[0]}`)
 
@@ -97,7 +103,7 @@ export default class Bot {
       LogService.error("CommandHandler", e)
 
       // Tell the user there was a problem
-      return this.client.replyNotice(roomId, ev, replyMessage)
+      return await this.client.replyNotice(roomId, ev, replyMessage)
     }
   }
 }
