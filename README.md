@@ -12,7 +12,7 @@ Eng requirements [doc](https://docs.google.com/document/d/1wOUP6AX4XKBzaeu8MKgm2
 
 To build it: `yarn build`.
 
-To run it: `yarn start:dev`
+To run it: `yarn dev`
 
 To check the lint: `yarn lint`
 
@@ -49,12 +49,3 @@ This is where the project's build files go. Not really much to see here.
 ### `storage/`
 
 This is the default storage location. Also not much to see here.
-
-## Help!
-
-Come visit us in [#matrix-bot-sdk:t2bot.io](https://matrix.to/#/#matrix-bot-sdk:t2bot.io) on Matrix if you're
-having trouble with this template.
-
-## Credits
-
-Credit to anoa's [matrix-nio template](https://github.com/anoadragon453/nio-template) for the README format.
