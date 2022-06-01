@@ -18,11 +18,12 @@
   "scripts": {
     "build": "tsc",
     "eslint": "eslint",
-    "lint": "yarn eslint && yarn typecheck && prettier",
+    "lint": "yarn eslint && yarn typecheck && yarn prettier",
     "dev": "nodemon -- src/main.ts",
     "typecheck": "tsc --noEmit",
+    "prettier": "prettier --check '{*,**/*}.{json,html}'",
     "fix:eslint": "eslint --fix",
-    "fix:prettier": "prettier --write",
+    "fix:prettier": "prettier --write '{*,**/*}.{json,html}'",
     "fix": "yarn fix:eslint '{*,**/*}.ts' && yarn fix:prettier '{*,**/*}.json'"
   },
   "dependencies": {
