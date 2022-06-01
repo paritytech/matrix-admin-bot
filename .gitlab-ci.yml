@@ -93,6 +93,7 @@ check-linting:
   <<:                              *common-refs
   <<:                              *kubernetes-env
   script:
+    - apk update && apk add --no-cache git
     - yarn --immutable
     - yarn lint
 
@@ -101,6 +102,7 @@ check-tests:
   <<:                              *common-refs
   <<:                              *kubernetes-env
   script:
+    - apk update && apk add --no-cache git
     - yarn --immutable
     - yarn test
 
