@@ -18,7 +18,6 @@ variables:
   GIT_STRATEGY:                    fetch
   CI_IMAGE:                        node:16.10-alpine
   DOCKERHUB_REPO:                  "paritytech"
-  COMPONENT:                       "bot"
   IMAGE_NAME:                      docker.io/$DOCKERHUB_REPO/matrix-admin-bot
   DOCKER_TAG:                      "${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
 
@@ -32,19 +31,19 @@ variables:
 .publish-refs:                     &publish-refs
   rules:
     - if: $CI_PIPELINE_SOURCE == "web" &&
-        $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # on tags (i.e. v1.0, v2.1rc1) and from web interface
+        $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/                # on tags (i.e. v1.0, v2.1rc1) and from web interface
     - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # on tags (i.e. v1.0, v2.1rc1)
 
-.deploy-stg-refs:                     &deploy-stg-refs
+.deploy-stg-refs:                  &deploy-stg-refs
   rules:
     - if: $CI_PIPELINE_SOURCE == "web" &&
-        $CI_COMMIT_REF_NAME == "main" # on commits to main branch and from web interface
-    - if: $CI_COMMIT_REF_NAME == "main" # on commits to main branch
+        $CI_COMMIT_REF_NAME == "main"                               # on commits to main branch and from web interface
+    - if: $CI_COMMIT_REF_NAME == "main"                             # on commits to main branch
 
-.deploy-prod-refs:                     &deploy-prod-refs
+.deploy-prod-refs:                 &deploy-prod-refs
   rules:
     - if: $CI_PIPELINE_SOURCE == "web" &&
-        $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # on tags (i.e. v1.0, v2.1rc1) and from web interface
+        $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/                # on tags (i.e. v1.0, v2.1rc1) and from web interface
     - if: $CI_COMMIT_REF_NAME =~ /^v[0-9]+\.[0-9]+.*$/              # on tags (i.e. v1.0, v2.1rc1)
 
 .kubernetes-env:                   &kubernetes-env
@@ -113,7 +112,6 @@ build-docker-bot:
   <<:                              *build-only-docker-image
   variables:
     DOCKERFILE:                    "Dockerfile"
-    COMPONENT:                     bot
 
 
 publish-docker-bot:
@@ -123,7 +121,6 @@ publish-docker-bot:
   <<:                              *build-push-docker-image
   variables:
     DOCKERFILE:                    "Dockerfile"
-    COMPONENT:                     bot
 
 #### stage:                        deploy
 #
