@@ -96,14 +96,6 @@ check-linting:
     - yarn --immutable
     - yarn lint
 
-check-tests:
-  stage:                           test
-  <<:                              *common-refs
-  <<:                              *kubernetes-env
-  script:
-    - yarn --immutable
-    - yarn test
-
 build-docker-bot:
   stage:                           build
   <<:                              *common-refs
