@@ -146,7 +146,7 @@ deploy-stg:
   # <<:                              *publish-deploy-stg-refs
   # remove after debug
   <<:                              *test-refs
-    variables:
+  variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-stg
   environment:
