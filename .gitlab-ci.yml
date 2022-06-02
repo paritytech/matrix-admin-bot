@@ -1,7 +1,8 @@
 stages:
   - test
   - build
-#  - deploy
+  - staging
+  - production
 
 default:
   interruptible:                   true
