@@ -1,0 +1,29 @@
+gcloud-sqlproxy:
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: 'matrix-admin-bot@parity-stg.iam.gserviceaccount.com'
+  cloudsql:
+    instances:
+    - instance: "matrix-admin-bot-db-pgsql"
+      project: "parity-stg"
+      region: "europe-west3"
+      port: 5432
+
+common:
+  env:
+    APP_HOST: "https://matrix-admin-bot.parity-stg.parity.io"
+    DATABASE_NAME: "matrix-admin-bot"
+  secrets:
+    ACCESS_TOKEN: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#DATABASE_URI
+  ingress:
+    annotations:
+      external-dns.alpha.kubernetes.io/target: traefik-internal.parity-stg.parity.io.
+    hosts:
+      - host: matrix-admin-bot.parity-stg.parity.io
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+    - secretName: matrix-admin-bot.parity-stg.parity.io
+      hosts:
+        - matrix-admin-bot.parity-stg.parity.io
