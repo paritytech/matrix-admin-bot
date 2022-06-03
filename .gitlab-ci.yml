@@ -14,7 +14,7 @@ default:
       - api_failure
 
 variables:
-  KUBE_NAMESPACE:                  "matrixadminbot"
+  KUBE_NAMESPACE:                  "matrix-admin-bot"
   CI_REGISTRY:                     "docker.io/paritytech"
   GIT_STRATEGY:                    fetch
   CI_IMAGE:                        node:16.10-alpine
