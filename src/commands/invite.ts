@@ -6,8 +6,8 @@ import {
 } from "matrix-bot-sdk"
 import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
-import { groupedRooms, RoomGroups } from "src/config/rooms"
-import { CommandError, sleep } from "src/utils"
+import { groupedRooms, RoomGroups } from "../config/rooms"
+import { CommandError, sleep } from "../utils"
 
 const moduleName = "InviteCommand"
 export const defaultGroups = [RoomGroups.common, RoomGroups.engineering]

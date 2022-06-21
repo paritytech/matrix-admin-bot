@@ -25,4 +25,4 @@ RUN apk update && \
 
 ENV NODE_ENV=production
 
-CMD ["node", "build/bot.js"]
+CMD ["node", "build/main.js"]

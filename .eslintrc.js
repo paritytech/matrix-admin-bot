@@ -2,4 +2,8 @@ const {
   getConfiguration,
 } = require("opstooling-js-style/src/eslint/configuration")
 
-module.exports = getConfiguration({ typescript: { rootDir: __dirname } })
+const config = getConfiguration({ typescript: { rootDir: __dirname } })
+
+config.rules["no-restricted-imports"] = ["off"]
+
+module.exports = config

@@ -6,8 +6,8 @@ import {
   RichReply,
 } from "matrix-bot-sdk"
 
-import { commandPrefix } from "src/bot"
-import { RoomGroups } from "src/config/rooms"
+import { commandPrefix } from "../bot"
+import { RoomGroups } from "../config/rooms"
 
 import { defaultGroups } from "./invite"
 

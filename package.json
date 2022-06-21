@@ -14,7 +14,7 @@
   "engines": {
     "node": "16.x"
   },
-  "main": "dist/bot.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
     "eslint": "eslint",
