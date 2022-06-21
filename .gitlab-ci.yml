@@ -1,7 +1,8 @@
 stages:
   - test
   - build
-#  - deploy
+  - staging
+  - production
 
 default:
   interruptible:                   true
@@ -13,13 +14,17 @@ default:
       - api_failure
 
 variables:
-  KUBE_NAMESPACE:                  "matrixadminbot"
+  KUBE_NAMESPACE:                  "matrix-admin-bot"
   CI_REGISTRY:                     "docker.io/paritytech"
   GIT_STRATEGY:                    fetch
   CI_IMAGE:                        node:16.10-alpine
   DOCKERHUB_REPO:                  "paritytech"
   IMAGE_NAME:                      docker.io/$DOCKERHUB_REPO/matrix-admin-bot
-  DOCKER_TAG:                      "${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
+  DOCKER_TAG:                      "${CI_COMMIT_SHORT_SHA}"
+  VAULT_ADDR:                      "https://vault.parity-mgmt-vault.parity.io"
+  VAULT_AUTH_PATH:                 "gitlab-parity-io-jwt"
+  VAULT_AUTH_ROLE:                 "cicd_gitlab_parity_${CI_PROJECT_NAME}"
+  HELM_SECRETS_DRIVER:             vals
 
 .common-refs:                      &common-refs
   rules:
@@ -116,27 +121,42 @@ publish-docker-bot:
     DOCKERFILE:                    "Dockerfile"
 
 #### stage:                        deploy
-#
-#.deploy-k8s:                       &deploy-k8s
-#  image:                           paritytech/kubetools:helm3
-#  script:
-#    - echo ${KUBE_NAMESPACE}
-#    - echo ${CI_ENVIRONMENT_NAME}
-#    - helm repo add parity https://paritytech.github.io/helm-charts/
-#    - helm repo update
-#    # install/upgrade
-#    - helm upgrade matrix-admin-${CI_ENVIRONMENT_NAME} parity/tbd
-#      --install
-#      --atomic
-#      --namespace ${KUBE_NAMESPACE}
-#      --values kubernetes/matrix-admin-bot-values.yaml
-#      --set bot.secret.ACCESS_TOKEN="${ACCESS_TOKEN}"
-#      --set bot.image.dockerTag="${DOCKER_TAG}"
-#
-#bot:
-#  stage:                           deploy
-#  environment:
-#    name:                          versi
-#  <<:                              *deploy-stg-refs
-#  <<:                              *kubernetes-env
-#  <<:                              *deploy-k8s
+
+.deploy:                           &deploy-k8s
+  script:
+    # https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/#example
+    - export VAULT_TOKEN="$(vault write -field=token auth/$VAULT_AUTH_PATH/login role=$VAULT_AUTH_ROLE jwt=$CI_JOB_JWT)"
+    - helm dependency update helm/
+    - helm secrets --version
+    - helm secrets upgrade
+        --install
+        --atomic
+        --timeout 300s
+        --namespace ${CI_PROJECT_NAME}
+        --values helm/values.yaml
+        --values helm/values-$ENVIRONMENT.yaml
+        --set common.image.tag="$DOCKER_TAG"
+        $CI_PROJECT_NAME helm/
+    - kubectl get pods -n ${CI_PROJECT_NAME}
+
+deploy-stg:
+  stage:                           staging
+  <<:                              *deploy-k8s
+  <<:                              *kubernetes-env
+  <<:                              *publish-deploy-stg-refs
+  variables:
+    CI_IMAGE:                      "paritytech/kubetools:3.5.3"
+    ENVIRONMENT:                   parity-stg
+  environment:
+    name:                          parity-stg
+
+deploy-prod-ui:
+  stage:                           production
+  <<:                              *deploy-k8s
+  <<:                              *kubernetes-env
+  <<:                              *deploy-prod-refs
+  variables:
+    CI_IMAGE:                      "paritytech/kubetools:3.5.3"
+    ENVIRONMENT:                   parity-prod
+  environment:
+    name:                          parity-prod
