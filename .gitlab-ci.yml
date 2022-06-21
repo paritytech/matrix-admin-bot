@@ -103,8 +103,7 @@ check-linting:
     - yarn --immutable
     - yarn lint
 
-# enable after debug
-.build-docker-bot:
+build-docker-bot:
   stage:                           build
   <<:                              *test-refs
   <<:                              *kubernetes-env
@@ -115,10 +114,7 @@ check-linting:
 
 publish-docker-bot:
   stage:                           build
-  # uncomment after debug
-  # <<:                              *publish-deploy-stg-refs
-  # remove after debug
-  <<:                              *test-refs
+  <<:                              *publish-deploy-stg-refs
   <<:                              *kubernetes-env
   <<:                              *build-push-docker-image
   variables:
@@ -147,10 +143,7 @@ deploy-stg:
   stage:                           staging
   <<:                              *deploy-k8s
   <<:                              *kubernetes-env
-  # uncomment after debug
-  # <<:                              *publish-deploy-stg-refs
-  # remove after debug
-  <<:                              *test-refs
+  <<:                              *publish-deploy-stg-refs
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-stg
