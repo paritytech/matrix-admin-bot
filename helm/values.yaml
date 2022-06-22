@@ -8,6 +8,8 @@ gcloud-sqlproxy:
 
 common:
   fullnameOverride: "matrix-admin-bot"
+  extraLabels:
+    team: "opstooling"
   serviceAccount:
     create: false
   image:
@@ -16,7 +18,11 @@ common:
     - secretRef:
         name: matrix-admin-bot
   service:
-    containerPort: 8000
+    ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8000
   ingress:
     enabled: true
     annotations:

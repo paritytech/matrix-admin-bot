@@ -18,12 +18,18 @@ common:
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: traefik-internal.parity-prod.parity.io.
-    hosts:
-      - host: matrix-admin-bot.parity-prod.parity.io
+    rules:
+    - host: matrix-admin-bot.parity-prod.parity.io
+      http:
         paths:
-          - path: /
-            pathType: ImplementationSpecific
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: matrix-admin-bot
+              port:
+                name: http
     tls:
-    - secretName: matrix-admin-bot.parity-prod.parity.io
-      hosts:
-        - matrix-admin-bot.parity-prod.parity.io
+    - hosts:
+      - matrix-admin-bot.parity-prod.parity.io
+      secretName: matrix-admin-bot.parity-prod.parity.io

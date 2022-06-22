@@ -9,5 +9,5 @@ dependencies:
   version: "0.22.6"
   repository: "https://charts.rimusz.net"
 - name: common
-  version: "0.1.6"
+  version: "0.2.0"
   repository: "https://paritytech.github.io/helm-charts/"
