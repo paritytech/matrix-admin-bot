@@ -24,5 +24,6 @@ RUN apk update && \
     yarn build
 
 ENV NODE_ENV=production
+ENV TS_NODE_BASEURL=./build
 
-CMD ["node", "build/main.js"]
+CMD ["yarn", "start"]

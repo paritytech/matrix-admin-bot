@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*", "./*"]
+    },
     "outDir": "build",
     "sourceMap": false,
     "declaration": false,
