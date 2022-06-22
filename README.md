@@ -49,3 +49,12 @@ This is where the project's build files go. Not really much to see here.
 ### `storage/`
 
 This is the default storage location. Also not much to see here.
+
+
+## Development process
+
+Once you followed all steps above, and server is up and running
+
+- Create a private room for testing your bot from localhost (make sure to have Encryption DISABLED, otherwise bot won't be able to recognize commands)
+- Invite your bot to this room (invitations are auto-accepted)
+- Write command in channel with your bot, and have fun :) 

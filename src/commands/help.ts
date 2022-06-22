@@ -8,7 +8,6 @@ import {
 
 import { commandPrefix } from "src/bot"
 import { RoomGroups } from "src/config/rooms"
-
 import { defaultGroups } from "./invite"
 
 export async function runHelpCommand(

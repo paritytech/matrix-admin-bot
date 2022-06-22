@@ -14,9 +14,10 @@
   "engines": {
     "node": "16.x"
   },
-  "main": "dist/bot.js",
+  "main": "build/main.js",
   "scripts": {
     "build": "tsc",
+    "start": "TS_NODE_BASEURL=./build node -r tsconfig-paths/register build/main.js",
     "eslint": "eslint",
     "lint": "yarn eslint && yarn typecheck && yarn prettier",
     "dev": "nodemon -- src/main.ts",
@@ -31,8 +32,7 @@
     "escape-html": "^1.0.3",
     "joi": "^17.6.0",
     "js-yaml": "^4.1.0",
-    "matrix-bot-sdk": "^0.5.19",
-    "tsconfig-paths": "^4.0.0"
+    "matrix-bot-sdk": "^0.5.19"
   },
   "devDependencies": {
     "@resolritter/tsc-files": "^1.1.4",
@@ -42,6 +42,7 @@
     "nodemon": "^2.0.16",
     "opstooling-js-style": "https://github.com/paritytech/opstooling-js-style#master",
     "ts-node": "^10.7.0",
+    "tsconfig-paths": "^4.0.0",
     "tslint": "^6.1.3",
     "typescript": "^4.6.4"
   }
