@@ -114,7 +114,9 @@ build-docker-bot:
 
 publish-docker-bot:
   stage:                           build
-  <<:                              *publish-deploy-stg-refs
+  # uncomment after debug
+  # <<:                              *publish-deploy-stg-refs
+  <<: *common-refs
   <<:                              *kubernetes-env
   <<:                              *build-push-docker-image
   variables:
@@ -143,14 +145,16 @@ deploy-stg:
   stage:                           staging
   <<:                              *deploy-k8s
   <<:                              *kubernetes-env
-  <<:                              *publish-deploy-stg-refs
+  # uncomment after debug
+  # <<:                              *publish-deploy-stg-refs
+  <<: *common-refs
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-stg
   environment:
     name:                          parity-stg
 
-deploy-prod-ui:
+deploy-prod:
   stage:                           production
   <<:                              *deploy-k8s
   <<:                              *kubernetes-env
