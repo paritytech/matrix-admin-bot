@@ -129,7 +129,8 @@ publish-docker-bot:
     # https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/#example
     - export VAULT_TOKEN="$(vault write -field=token auth/$VAULT_AUTH_PATH/login role=$VAULT_AUTH_ROLE jwt=$CI_JOB_JWT)"
     - helm dependency update helm/
-    - helm secrets install
+    - helm secrets upgrade
+        --install
         --timeout 300s
         --namespace ${CI_PROJECT_NAME}
         --values helm/values.yaml
