@@ -16,7 +16,7 @@ const environmentSchema = Joi.object<Environment>({
   LOG_LEVEL: Joi.string().default("info"),
   ACCESS_TOKEN: Joi.string().required(),
   DATA_PATH: Joi.string().default("storage"),
-  MATRIX_SERVER_URL: Joi.string().default("https://matrix.org"),
+  MATRIX_SERVER_URL: Joi.string().default("https://matrix.parity.io"),
 })
 
 const { value, error } = environmentSchema.validate(process.env, {
