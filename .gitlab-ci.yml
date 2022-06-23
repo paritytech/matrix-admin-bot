@@ -94,7 +94,7 @@ variables:
       --tag "$IMAGE_NAME:latest"
       --file "$DOCKERFILE" .
 
-check-linting:
+.check-linting:
   stage:                           test
   <<:                              *common-refs
   <<:                              *kubernetes-env
@@ -103,7 +103,7 @@ check-linting:
     - yarn --immutable
     - yarn lint
 
-build-docker-bot:
+.build-docker-bot:
   stage:                           build
   <<:                              *test-refs
   <<:                              *kubernetes-env
@@ -112,7 +112,7 @@ build-docker-bot:
     DOCKERFILE:                    "Dockerfile"
 
 
-publish-docker-bot:
+.publish-docker-bot:
   stage:                           build
   # uncomment after debug
   # <<:                              *publish-deploy-stg-refs
