@@ -129,16 +129,14 @@ variables:
     # https://docs.gitlab.com/ee/ci/examples/authenticating-with-hashicorp-vault/#example
     - export VAULT_TOKEN="$(vault write -field=token auth/$VAULT_AUTH_PATH/login role=$VAULT_AUTH_ROLE jwt=$CI_JOB_JWT)"
     - helm dependency update helm/
-    - helm history $CI_PROJECT_NAME --namespace ${CI_PROJECT_NAME}
-    - helm rollback $CI_PROJECT_NAME 13 --namespace ${CI_PROJECT_NAME}
-    # - helm secrets upgrade
-    #     --install
-    #     --timeout 300s
-    #     --namespace ${CI_PROJECT_NAME}
-    #     --values helm/values.yaml
-    #     --values helm/values-$ENVIRONMENT.yaml
-    #     --set common.image.tag="$DOCKER_TAG"
-    #     $CI_PROJECT_NAME helm/
+    # - helm history $CI_PROJECT_NAME --namespace ${CI_PROJECT_NAME}
+    - helm secrets upgrade
+        --install
+        --namespace ${CI_PROJECT_NAME}
+        --values helm/values.yaml
+        --values helm/values-$ENVIRONMENT.yaml
+        --set common.image.tag="$DOCKER_TAG"
+        $CI_PROJECT_NAME helm/
     # - helm secrets --version
     # - helm secrets upgrade
     #     --install
