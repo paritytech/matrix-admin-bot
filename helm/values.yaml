@@ -30,13 +30,13 @@ common:
       kubernetes.io/ingress.class: traefik-internal
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: 8000
-      scheme: HTTP
-  readinessProbe:
-    httpGet:
-      path: /health
-      port: 8000
-      scheme: HTTP
+  # livenessProbe:
+  #   httpGet:
+  #     path: /health
+  #     port: 8000
+  #     scheme: HTTP
+  # readinessProbe:
+  #   httpGet:
+  #     path: /health
+  #     port: 8000
+  #     scheme: HTTP
