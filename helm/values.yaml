@@ -30,6 +30,7 @@ common:
       kubernetes.io/ingress.class: traefik-internal
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
+  # Enable after endpoint is created
   # livenessProbe:
   #   httpGet:
   #     path: /health
