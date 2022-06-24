@@ -150,7 +150,7 @@ deploy-stg:
   environment:
     name:                          parity-stg
 
-deploy-prod-ui:
+deploy-prod:
   stage:                           production
   <<:                              *deploy-k8s
   <<:                              *kubernetes-env
