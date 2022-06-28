@@ -24,8 +24,6 @@ export const groupedRooms: { [k: string]: string[] } = {
     '!rOvpVjZCuxwdGDoiZs:matrix.parity.io', // Parity Berlin Office
     '!aenJixaHcSKbJOWxYk:matrix.parity.io', // Substrate
     '!qoanQXLalRnFLPuvtV:matrix.parity.io', // Engineering Updates
-    // temporary
-    '!TMIbnEhhKugsxnFEZD:matrix.parity.io', // Company Retreat 2022
   ],
   [RoomGroups.engineering]: [
     '!FdCojkeGzZLSEoiecf:web3.foundation',  // Polkadot Watercooler
