@@ -1,10 +1,10 @@
-gcloud-sqlproxy:
-  serviceAccountName: "matrix-admin-bot"
-  serviceAccount:
-    create: true
-    name: matrix-admin-bot
-  networkPolicy:
-    enabled: false
+# gcloud-sqlproxy:
+#   serviceAccountName: "matrix-admin-bot"
+#   serviceAccount:
+#     create: true
+#     name: matrix-admin-bot
+#   networkPolicy:
+#     enabled: false
 
 common:
   fullnameOverride: "matrix-admin-bot"
