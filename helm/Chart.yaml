@@ -5,9 +5,9 @@ type: application
 version: 0.2.1
 appVersion: "1.16.0"
 dependencies:
-- name: gcloud-sqlproxy
-  version: "0.22.6"
-  repository: "https://charts.rimusz.net"
+# - name: gcloud-sqlproxy
+#   version: "0.22.6"
+#   repository: "https://charts.rimusz.net"
 - name: common
   version: "0.2.2"
   repository: "https://paritytech.github.io/helm-charts/"

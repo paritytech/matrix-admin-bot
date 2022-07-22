@@ -1,13 +1,13 @@
-gcloud-sqlproxy:
-  serviceAccount:
-    annotations:
-      iam.gke.io/gcp-service-account: 'matrix-admin-bot@parity-prod.iam.gserviceaccount.com'
-  cloudsql:
-    instances:
-    - instance: "matrix-admin-bot-db-pgsql"
-      project: "parity-prod"
-      region: "europe-west3"
-      port: 5432
+# gcloud-sqlproxy:
+#   serviceAccount:
+#     annotations:
+#       iam.gke.io/gcp-service-account: 'matrix-admin-bot@parity-prod.iam.gserviceaccount.com'
+#   cloudsql:
+#     instances:
+#     - instance: "matrix-admin-bot-db-pgsql"
+#       project: "parity-prod"
+#       region: "europe-west3"
+#       port: 5432
 
 common:
   env:
