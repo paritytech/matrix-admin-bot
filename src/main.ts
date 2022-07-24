@@ -1,6 +1,5 @@
 import {
   AutojoinRoomsMixin,
-  LogLevel,
   LogService,
   MatrixClient,
   RichConsoleLogger,
@@ -16,7 +15,7 @@ const moduleName = "index"
 /* TODO: replace with https://github.com/paritytech/opstooling-js/blob/master/src/logger.ts */
 LogService.setLogger(new RichConsoleLogger())
 
-LogService.setLevel(LogLevel.DEBUG)
+LogService.setLevel(config.LOG_LEVEL)
 
 // Print something so we know the bot is working
 LogService.info(moduleName, "Bot starting...")

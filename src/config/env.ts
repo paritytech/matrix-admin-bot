@@ -1,5 +1,6 @@
 import "dotenv/config"
 import Joi from "joi"
+import { LogLevel } from "matrix-bot-sdk"
 
 export interface Environment {
   CI: boolean
@@ -7,13 +8,13 @@ export interface Environment {
   MATRIX_SERVER_URL: string
   ACCESS_TOKEN: string
   DATA_PATH: string
-  LOG_LEVEL: string
+  LOG_LEVEL: LogLevel
 }
 
 const environmentSchema = Joi.object<Environment>({
   NODE_ENV: Joi.string(),
   CI: Joi.boolean().default(false),
-  LOG_LEVEL: Joi.string().default("info"),
+  LOG_LEVEL: Joi.string().default(LogLevel.INFO),
   ACCESS_TOKEN: Joi.string().required(),
   DATA_PATH: Joi.string().default("storage"),
   MATRIX_SERVER_URL: Joi.string().default("https://matrix.parity.io"),
