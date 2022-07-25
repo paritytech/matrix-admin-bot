@@ -10,6 +10,12 @@ import { runHelpCommand } from "./commands/help"
 import { runInviteCommand } from "./commands/invite"
 import { CommandError } from "./utils"
 
+/* This is the maximum allowed time between time on matrix server
+   and time when bot caught event */
+const MAX_TIMEOUT_MS = 1000
+
+const moduleName = "CommandHandler"
+
 /* The prefix required to trigger the bot. The bot will also respond
    to being pinged directly. */
 export const commandPrefix = "!adminbot"
@@ -49,7 +55,7 @@ export default class Bot {
       }
     } catch (e) {
       // Non-fatal error - we'll just log it and move on.
-      LogService.warn("CommandHandler", e)
+      LogService.warn(moduleName, e)
     }
   }
 
@@ -58,6 +64,17 @@ export default class Bot {
     if (event.isRedacted) return // Ignore redacted events that come through
     if (event.sender === this.userId) return // Ignore ourselves
     if (event.messageType !== "m.text") return // Ignore non-text messages
+    // Ignore old messages, which may have sent when bot wasn't online
+    if (Date.now() - event.timestamp > MAX_TIMEOUT_MS) {
+      LogService.info(
+        moduleName,
+        "Skip message by timeout: " + JSON.stringify(event),
+      )
+
+      return
+    }
+
+    LogService.debug(moduleName, event)
 
     /* Ensure that the event is a command before going on. We allow people to ping
            the bot as well as using our COMMAND_PREFIX. */
@@ -81,7 +98,7 @@ export default class Bot {
         return arg.trim().length !== 0
       })
 
-    LogService.info(`Got a new command: ${args[0]}`)
+    LogService.info(moduleName, `Got a new command: ${args.toString()}`)
 
     // Try and figure out what command the user ran, defaulting to help
     try {
@@ -100,7 +117,7 @@ export default class Bot {
       }
 
       // Log the error
-      LogService.error("CommandHandler", e)
+      LogService.error(moduleName, e)
 
       // Tell the user there was a problem
       return await this.client.replyNotice(roomId, ev, replyMessage)

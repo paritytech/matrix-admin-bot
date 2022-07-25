@@ -2,5 +2,5 @@
   "verbose": false,
   "watch": ["./src", ".env"],
   "ext": ".ts",
-  "exec": "node -r ts-node/register -r dotenv/config"
+  "exec": "node -r ts-node/register -r dotenv/config -r tsconfig-paths/register"
 }
