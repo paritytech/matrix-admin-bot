@@ -22,14 +22,14 @@ export const groupedRooms: { [k: string]: string[] } = {
     '!MjwzeAZAraDJjlEZKF:matrix.parity.io', // Berlin Lunch Train
     '!QlzEduKSoUTveNlXKu:matrix.parity.io', // Parity Lisbon Office
     '!rOvpVjZCuxwdGDoiZs:matrix.parity.io', // Parity Berlin Office
-    '!aenJixaHcSKbJOWxYk:matrix.parity.io', // Substrate
+    // default by matrix '!aenJixaHcSKbJOWxYk:matrix.parity.io', // Substrate
     '!qoanQXLalRnFLPuvtV:matrix.parity.io', // Engineering Updates
   ],
   [RoomGroups.engineering]: [
-    '!FdCojkeGzZLSEoiecf:web3.foundation',  // Polkadot Watercooler
-    '!HzySYSaIhtyWrwiwEV:matrix.org',       // Substrate Technical (Public)
+    // default by matrix '!FdCojkeGzZLSEoiecf:web3.foundation',  // Polkadot Watercooler
+    // default by matrix '!HzySYSaIhtyWrwiwEV:matrix.org',       // Substrate Technical (Public)
     '!AtgPynFxLJGFYkAZEl:matrix.parity.io', // Parity Support (Public)
-    '!IWlcTyHSqIEjpUReHD:matrix.parity.io', // Parity Watercooler (Public)
+    // default by matrix '!IWlcTyHSqIEjpUReHD:matrix.parity.io', // Parity Watercooler (Public)
   ],
   [RoomGroups.infra]: [
     '!gJeGMHCcDoIwsHIJri:matrix.parity.io', // CI/CD
