@@ -6,6 +6,7 @@ import {
   UserID,
 } from "matrix-bot-sdk"
 
+import { runDmCommand } from "./commands/dm"
 import { runHelpCommand } from "./commands/help"
 import { runInviteCommand } from "./commands/invite"
 import { CommandError } from "./utils"
@@ -102,10 +103,13 @@ export default class Bot {
 
     // Try and figure out what command the user ran, defaulting to help
     try {
-      if (args[0] === "invite") {
-        return await runInviteCommand(roomId, event, args, this.client)
-      } else {
-        return await runHelpCommand(roomId, event, this.client)
+      switch (args[0]) {
+        case "invite":
+          return await runInviteCommand(roomId, event, args, this.client)
+        case "msg":
+          return await runDmCommand(roomId, event, this.client)
+        default:
+          return await runHelpCommand(roomId, event, this.client)
       }
     } catch (e) {
       let replyMessage: string = "There was an error processing your command"
