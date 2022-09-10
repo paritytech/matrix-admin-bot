@@ -30,9 +30,9 @@ export async function runInviteCommand(
 
   if (!userId.includes(`:${IDENTITY_SERVER}`)) {
     // userId is something like "@username:identity.server.org"
-    const [wrongUsername, wrongIdentityServer] = userId.split(":")
+    const [, wrongIdentityServer] = userId.split(":")
     throw new CommandError(
-      `This handle is not registered under ${IDENTITY_SERVER}, but ${wrongIdentityServer}. \nMake sure that username looks like "${wrongUsername}:${IDENTITY_SERVER}"`,
+      `This handle is not registered under ${IDENTITY_SERVER}, but ${wrongIdentityServer}. \nMake sure that username ends with ":${IDENTITY_SERVER}"`,
     )
   }
 
