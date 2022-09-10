@@ -9,6 +9,8 @@ import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 import { groupedRooms, RoomGroups } from "src/config/rooms"
 import { CommandError, sleep } from "src/utils"
 
+const IDENTITY_SERVER = "matrix.parity.io"
+
 const moduleName = "InviteCommand"
 export const defaultGroups = [RoomGroups.common, RoomGroups.engineering]
 
@@ -25,6 +27,15 @@ export async function runInviteCommand(
   const groups: string[] = userGroups?.length ? userGroups : defaultGroups
   const username: string = await getUserDisplayName(client, userId)
   const rooms: RoomsList = getRoomsByGroups(groups)
+
+  if (!userId.includes(`:${IDENTITY_SERVER}`)) {
+    // userId is something like "@username:identity.server.org"
+    const [wrongUsername, wrongIdentityServer] = userId.split(":")
+    throw new CommandError(
+      `This handle is not registered under ${IDENTITY_SERVER}, but ${wrongIdentityServer}. \nMake sure that username looks like "${wrongUsername}:${IDENTITY_SERVER}"`,
+    )
+  }
+
   await sendMessage(
     client,
     roomId,
