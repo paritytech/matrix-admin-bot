@@ -23,16 +23,10 @@ LogService.info(moduleName, "Bot starting...")
 // This is the startup closure where we give ourselves an async context
 void (async () => {
   // Prepare the storage system for the bot
-  const storage = new SimpleFsStorageProvider(
-    path.join(config.DATA_PATH, "bot.json"),
-  )
+  const storage = new SimpleFsStorageProvider(path.join(config.DATA_PATH, "bot.json"))
 
   // Now create the client
-  const client = new MatrixClient(
-    config.MATRIX_SERVER_URL,
-    config.ACCESS_TOKEN,
-    storage,
-  )
+  const client = new MatrixClient(config.MATRIX_SERVER_URL, config.ACCESS_TOKEN, storage)
 
   // Setup the autojoin mixin (if enabled)
   AutojoinRoomsMixin.setupOnClient(client)

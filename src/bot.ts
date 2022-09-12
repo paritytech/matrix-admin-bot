@@ -1,13 +1,9 @@
-import {
-  LogService,
-  MatrixClient,
-  MatrixProfileInfo,
-  MessageEvent,
-  UserID,
-} from "matrix-bot-sdk"
+import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } from "matrix-bot-sdk"
+
+import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-channels"
 
 import { runHelpCommand } from "./commands/help"
-import { runInviteCommand } from "./commands/invite"
+import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -45,9 +41,7 @@ export default class Bot {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const profile: MatrixProfileInfo = await this.client.getUserProfile(
-        this.userId,
-      )
+      const profile: MatrixProfileInfo = await this.client.getUserProfile(this.userId)
 
       if (profile?.displayname) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -59,6 +53,8 @@ export default class Bot {
     }
   }
 
+  // disable eslint here due to poorly typed matrix bot sdk
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   private async onMessage(roomId: string, ev: any) {
     const event = new MessageEvent(ev)
     if (event.isRedacted) return // Ignore redacted events that come through
@@ -66,10 +62,7 @@ export default class Bot {
     if (event.messageType !== "m.text") return // Ignore non-text messages
     // Ignore old messages, which may have sent when bot wasn't online
     if (Date.now() - event.timestamp > MAX_TIMEOUT_MS) {
-      LogService.info(
-        moduleName,
-        "Skip message by timeout: " + JSON.stringify(event),
-      )
+      LogService.info(moduleName, "Skip message by timeout: " + JSON.stringify(event))
 
       return
     }
@@ -78,15 +71,8 @@ export default class Bot {
 
     /* Ensure that the event is a command before going on. We allow people to ping
            the bot as well as using our COMMAND_PREFIX. */
-    const prefixes = [
-      commandPrefix,
-      `${this.localpart}:`,
-      `${this.displayName}:`,
-      `${this.userId}:`,
-    ]
-    const prefixUsed = prefixes.find((p) => {
-      return event.textBody.startsWith(p)
-    })
+    const prefixes = [commandPrefix, `${this.localpart}:`, `${this.displayName}:`, `${this.userId}:`]
+    const prefixUsed = prefixes.find((p) => event.textBody.startsWith(p))
     if (!prefixUsed) return // Not a command (as far as we're concerned)
 
     // Check to see what the arguments were to the command
@@ -94,18 +80,20 @@ export default class Bot {
       .substring(prefixUsed.length)
       .trim()
       .split(" ")
-      .filter((arg) => {
-        return arg.trim().length !== 0
-      })
+      .filter((arg) => arg.trim().length !== 0)
 
     LogService.info(moduleName, `Got a new command: ${args.toString()}`)
 
     // Try and figure out what command the user ran, defaulting to help
     try {
-      if (args[0] === "invite") {
-        return await runInviteCommand(roomId, event, args, this.client)
-      } else {
-        return await runHelpCommand(roomId, event, this.client)
+      const [command] = args
+      switch (command) {
+        case INVITE_COMMAND:
+          return await runInviteCommand(roomId, event, args, this.client)
+        case LIST_ROOMS_COMMAND:
+          return await runListRoomsCommand(roomId, event, this.client, args[1])
+        default:
+          return await runHelpCommand(roomId, event, this.client)
       }
     } catch (e) {
       let replyMessage: string = "There was an error processing your command"

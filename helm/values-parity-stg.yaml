@@ -15,6 +15,7 @@ common:
     DATABASE_NAME: "matrix-admin-bot"
   secrets:
     ACCESS_TOKEN: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#ACCESS_TOKEN
+    INVITE_ROOMS_LIST: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#INVITE_ROOMS_LIST
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: traefik-internal.parity-stg.parity.io.
