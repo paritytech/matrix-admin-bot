@@ -2,7 +2,7 @@ import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
 import { commandPrefix } from "src/bot"
-import { LIST_ROOMS_COMMAND } from "src/commands/list-channels"
+import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
 import { groupedRooms } from "src/config/rooms"
 
 import { defaultGroups, INVITE_COMMAND } from "./invite"
