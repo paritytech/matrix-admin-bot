@@ -1,6 +1,6 @@
 import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } from "matrix-bot-sdk"
 
-import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-channels"
+import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
 
 import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
