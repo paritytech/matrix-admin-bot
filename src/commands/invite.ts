@@ -4,6 +4,8 @@ import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 import { groupedRooms } from "src/config/rooms"
 import { CommandError, sendMessage, sleep } from "src/utils"
 
+const MATRIX_HOMESERVER = "matrix.parity.io"
+
 const moduleName = "InviteCommand"
 export const defaultGroups = groupedRooms.filter((group) => group.default).map((group) => group.groupName)
 
@@ -22,7 +24,17 @@ export async function runInviteCommand(
   const groups: string[] = userGroups?.length ? userGroups : defaultGroups
   const username: string = await getUserDisplayName(client, userId)
   const rooms: RoomsList = getRoomsByGroups(groups)
+
+  if (!userId.includes(`:${MATRIX_HOMESERVER}`)) {
+    // userId is something like "@username:identity.server.org"
+    const [, wrongHomeServer] = userId.split(":")
+    throw new CommandError(
+      `This handle is not registered under ${MATRIX_HOMESERVER}, but ${wrongHomeServer}. \nMake sure that username ends with ":${MATRIX_HOMESERVER}"`,
+    )
+  }
+
   await sendMessage(client, roomId, `Started sending invites of ${username} to ${groups.join(", ")} groups`)
+
   const report: InviteReport = await inviteUserToRooms(client, rooms, userId)
 
   let resultMessage = `Added ${username} to ${report.succeedInviteCount}/${rooms.length} rooms`
