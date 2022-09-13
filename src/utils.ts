@@ -6,6 +6,9 @@ export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/**
+ * @returns {Promise<string>} resolves to the event ID that represents the event
+ */
 export function sendMessage(client: MatrixClient, roomId: string, message: string): Promise<string> {
   return client.sendMessage(roomId, { body: message, msgtype: "m.notice" })
 }
