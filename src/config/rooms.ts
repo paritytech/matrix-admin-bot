@@ -1,43 +1,9 @@
-export enum RoomGroups {
-  common = "common",
-  engineering = "engineering",
-  infra = "infra",
+import config from "src/config/env"
+
+export interface GroupOfRooms {
+  groupName: string
+  default: boolean
+  list: { id: string; name: string }[]
 }
 
-/* eslint-disable prettier/prettier, no-multi-spaces */
-export const groupedRooms: { [k: string]: string[] } = {
-  [RoomGroups.common]: [
-    '!DsFdtakbJIgTjrIEzf:matrix.parity.io', // Parity Liedown
-    '!sdFqbvLCnbwaqBLiGw:matrix.parity.io', // Parity Dumb Questions
-    '!fIDSZhCwduakimUvUR:matrix.parity.io', // Parity Forum
-    '!nZVIsjouiWCWuvbFOG:matrix.parity.io', // Parity Conferences
-    '!NdxrIlxGUHXYwtRGrF:matrix.parity.io', // Parity General
-    '!mbjCezomxKuQIIZrtL:matrix.parity.io', // Parity TechOps Watercooler
-    '!rYwGSweasiVlLZdftO:matrix.parity.io', // Parity IO
-    '!emIudoSRVQMhILqleG:matrix.parity.io', // Parity Simply Love ❤️✨
-    '!MNNdgVPLqzMqdZKYZv:matrix.parity.io', // Parity Announcements
-    '!KmcPJDgRVCqtJSnwQc:matrix.parity.io', // Today I Learned
-    '!JHwHMYLkHwAAqxjKgQ:matrix.parity.io', // Parity Social
-    '!vXIdAPypKvKVuztdqw:matrix.parity.io', // Parity Retreat
-    '!MjwzeAZAraDJjlEZKF:matrix.parity.io', // Berlin Lunch Train
-    '!QlzEduKSoUTveNlXKu:matrix.parity.io', // Parity Lisbon Office
-    '!rOvpVjZCuxwdGDoiZs:matrix.parity.io', // Parity Berlin Office
-    '!aenJixaHcSKbJOWxYk:matrix.parity.io', // Substrate
-    '!qoanQXLalRnFLPuvtV:matrix.parity.io', // Engineering Updates
-  ],
-  [RoomGroups.engineering]: [
-    '!FdCojkeGzZLSEoiecf:web3.foundation',  // Polkadot Watercooler
-    '!HzySYSaIhtyWrwiwEV:matrix.org',       // Substrate Technical (Public)
-    '!AtgPynFxLJGFYkAZEl:matrix.parity.io', // Parity Support (Public)
-    '!IWlcTyHSqIEjpUReHD:matrix.parity.io', // Parity Watercooler (Public)
-  ],
-  [RoomGroups.infra]: [
-    '!gJeGMHCcDoIwsHIJri:matrix.parity.io', // CI/CD
-    '!gYqcPOpJPouwsLuNiJ:matrix.parity.io', // DevOps Announcements
-    '!zlbZeGdMXSdHhLUOGw:matrix.parity.io', // Parity Devops
-    '!GGBcssYxoLuUHhpuGi:matrix.parity.io', // Westend DevOps
-    '!aLcsDaOyoXfxOeaTFI:matrix.parity.io', // Parity OpsTooling
-  ],
-}
-
-/* eslint-enable */
+export const groupedRooms: GroupOfRooms[] = config.INVITE_ROOMS_LIST
