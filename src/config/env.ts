@@ -14,15 +14,20 @@ export interface Environment {
   INVITE_ROOMS_LIST: GroupOfRooms[]
 }
 
+// By default, Joi expects all .env parameters as string
+// In case we pass JSON, that should be converted to Object/Array explicitly
 const JoiJSON = Joi.extend({
   type: "array",
   base: Joi.array(),
   coerce: {
     from: "string",
     method: (value: string) => {
+      // check if the given string starts with array bracket [ "1", "2", ... ]
+      // otherwise return raw value
       if (value[0] !== "[" && !/^\s*(\[)/.test(value)) {
         return { value }
       }
+      // parse string as JSON format
       try {
         return { value: JSON.parse(value) as GroupOfRooms[] }
       } catch (error) {
