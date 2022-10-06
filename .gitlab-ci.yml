@@ -20,7 +20,7 @@ variables:
   CI_IMAGE:                        node:16.10-alpine
   DOCKERHUB_REPO:                  "paritytech"
   IMAGE_NAME:                      docker.io/$DOCKERHUB_REPO/matrix-admin-bot
-  DOCKER_TAG:                      "${CI_COMMIT_SHORT_SHA}"
+  DOCKER_TAG:                      "${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
   VAULT_ADDR:                      "https://vault.parity-mgmt-vault.parity.io"
   VAULT_AUTH_PATH:                 "gitlab-parity-io-jwt"
   VAULT_AUTH_ROLE:                 "cicd_gitlab_parity_${CI_PROJECT_NAME}"
