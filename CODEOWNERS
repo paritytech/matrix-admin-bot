@@ -18,6 +18,7 @@
 
 # Global code owners
 * @paritytech/opstooling
+* @paritytech/business-automation
 
 # CI
 /.gitlab-ci.yml @paritytech/ci
