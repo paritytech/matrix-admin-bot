@@ -6,6 +6,7 @@ import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
 import { groupedRooms } from "src/config/rooms"
 
 import { defaultGroups, INVITE_COMMAND } from "./invite"
+import { PROMOTE_COMMAND } from "./promote"
 
 export async function runHelpCommand(
   roomId: string,
@@ -33,6 +34,23 @@ ${commandPrefix} ${INVITE_COMMAND} <userId> [<group>]
     Examples:
     - "${commandPrefix} invite @username:matrix.parity.io" - invite user to default ${allRoomGroups}
     - "${commandPrefix} invite @username:matrix.parity.io common opstooling" - custom groups
+
+--------------------------------------------------
+
+${commandPrefix} ${PROMOTE_COMMAND} <userId> <roomId> <powerLevel>
+    Assign a specific power level to the user in the room.
+    <userId>     - Matrix user id @username:matrix.parity.io
+    <roomId>     - Matrix room id !RaNdOmRoOmId:matrix.parity.io or #roomAlias:matrix.parity.io
+    <powerLewel> - Ddesired power level for the user as a number or alias:
+                   - Number (0-100)
+                   - Aliases:
+                     - default: 0
+                     - moderator: 50
+                     - admin: 100
+
+    Examples:
+    - "${commandPrefix} ${PROMOTE_COMMAND} @username:matrix.parity.io !MzyrIlxGUHXYwtRGrO:matrix.parity.io 99" - promote the user to level 99
+    - "${commandPrefix} ${PROMOTE_COMMAND} @username:matrix.parity.io #pupps:matrix.parity.io moderator" - promote the user to moderator level (50)
 
 --------------------------------------------------
 
