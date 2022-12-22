@@ -1,6 +1,7 @@
 import { MatrixClient, MessageEvent, MessageEventContent, MembershipEvent } from "matrix-bot-sdk"
 
 import { CommandError, sendMessage, sleep } from "src/utils"
+import config from "src/config/env"
 
 
 export const PROMOTE_COMMAND = "promote"
@@ -9,7 +10,6 @@ export const POWER_LEVEL_ALIAS: Record<string, number> = {
   moderator: 50,
   admin: 100
 }
-const MATRIX_HOMESERVER = "matrix.parity.io"
 
 export async function runPromoteCommand(
   roomId: string,
@@ -20,16 +20,16 @@ export async function runPromoteCommand(
 ): Promise<string> {
   // 1. Retrive and validate arguments
   const [, userId, targetRoomId, powerLevelArg] = args
-  if (!userId || !userId.includes(`:${MATRIX_HOMESERVER}`)) {
+  if (!userId || !userId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     const [, wrongHomeServer] = userId.split(":")
     throw new CommandError(
-      `The provided user handle is not registered under ${MATRIX_HOMESERVER}, but ${wrongHomeServer}. \nMake sure that username ends with ":${MATRIX_HOMESERVER}"`,
+      `The provided user handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that username ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
     )
   }
-  if (!targetRoomId || !targetRoomId.includes(`:${MATRIX_HOMESERVER}`)) {
+  if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     const [, wrongHomeServer] = targetRoomId.split(":")
     throw new CommandError(
-      `The provided room handle is not registered under ${MATRIX_HOMESERVER}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${MATRIX_HOMESERVER}"`,
+      `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
     )
   }
   if (!powerLevelArg) {
@@ -65,7 +65,6 @@ export async function runPromoteCommand(
     userMembershipEvent = roomMemberEvents.find((x) => x.sender === userId) || null
     botMembershipEvent = roomMemberEvents.find((x) => x.sender === botUserId) || null
   } catch (e) {
-    console.error(e)
     throw new CommandError(`Unable to retrieve a list of the room members.`)
   }
   if (!botMembershipEvent || botMembershipEvent.content.membership !== "join") {
@@ -80,12 +79,19 @@ export async function runPromoteCommand(
   // 4. Check the current power levels of the user and the bot
   let userPowerLevel: number = NaN
   let botPowerLevel: number = NaN
+  let requiredPowerLevel: number = NaN
   try {
     const powerLevelsEvent = await client.getRoomStateEvent(targetRoomId, "m.room.power_levels", null)
     userPowerLevel = powerLevelsEvent.users[userId] || 0
     botPowerLevel = powerLevelsEvent.users[botUserId] || 0
+    requiredPowerLevel = powerLevelsEvent.events["m.room.power_levels"] || 0
   } catch (e) {
     throw new CommandError(`Unable to retrieve the current power level of the user.`)
+  }
+  if (botPowerLevel < requiredPowerLevel) {
+    throw new CommandError(
+      `The command cannot be executed because the bot's power level (${botPowerLevel}) is lower than the required power level (${requiredPowerLevel}) for changing another user's power level.`,
+    )
   }
   if (botPowerLevel < userPowerLevel) {
     throw new CommandError(

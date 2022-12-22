@@ -8,6 +8,7 @@ export interface Environment {
   CI: boolean
   NODE_ENV: string
   MATRIX_SERVER_URL: string
+  MATRIX_SERVER_DOMAIN: string
   ACCESS_TOKEN: string
   DATA_PATH: string
   LOG_LEVEL: LogLevel
@@ -44,6 +45,7 @@ const environmentSchema = Joi.object<Environment>({
   ACCESS_TOKEN: Joi.string().required(),
   DATA_PATH: Joi.string().default("storage"),
   MATRIX_SERVER_URL: Joi.string().default("https://matrix.parity.io"),
+  MATRIX_SERVER_DOMAIN: Joi.string().default("matrix.parity.io"),
   INVITE_ROOMS_LIST: JoiJSON.array()
     .items(
       Joi.object<GroupOfRooms>({
