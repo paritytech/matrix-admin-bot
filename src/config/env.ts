@@ -44,8 +44,8 @@ const environmentSchema = Joi.object<Environment>({
   LOG_LEVEL: Joi.string().default(LogLevel.INFO),
   ACCESS_TOKEN: Joi.string().required(),
   DATA_PATH: Joi.string().default("storage"),
-  MATRIX_SERVER_URL: Joi.string().default("https://matrix.parity.io"),
-  MATRIX_SERVER_DOMAIN: Joi.string().default("matrix.parity.io"),
+  MATRIX_SERVER_URL: Joi.string().default("https://m.parity.io"),
+  MATRIX_SERVER_DOMAIN: Joi.string().default("parity.io"),
   INVITE_ROOMS_LIST: JoiJSON.array()
     .items(
       Joi.object<GroupOfRooms>({
