@@ -13,6 +13,8 @@ common:
   env:
     APP_HOST: "https://matrix-admin-bot.parity-stg.parity.io"
     DATABASE_NAME: "matrix-admin-bot"
+    MATRIX_SERVER_URL: "https://matrix.parity.io"
+    MATRIX_SERVER_DOMAIN: "matrix.parity.io"
   secrets:
     ACCESS_TOKEN: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#ACCESS_TOKEN
     INVITE_ROOMS_LIST: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#INVITE_ROOMS_LIST
