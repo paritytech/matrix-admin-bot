@@ -4,6 +4,7 @@ import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms
 
 import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
+import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -92,6 +93,8 @@ export default class Bot {
           return await runInviteCommand(roomId, event, args, this.client)
         case LIST_ROOMS_COMMAND:
           return await runListRoomsCommand(roomId, event, this.client, args[1])
+        case PROMOTE_COMMAND:
+          return await runPromoteCommand(roomId, event, args, this.client, this.userId)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }
