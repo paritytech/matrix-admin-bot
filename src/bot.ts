@@ -5,7 +5,9 @@ import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms
 import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
+import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
 import { CommandError } from "./utils"
+import { commandPrefix } from "src/constants"
 
 /* This is the maximum allowed time between time on matrix server
    and time when bot caught event */
@@ -13,9 +15,6 @@ const MAX_TIMEOUT_MS = 1000
 
 const moduleName = "CommandHandler"
 
-/* The prefix required to trigger the bot. The bot will also respond
-   to being pinged directly. */
-export const commandPrefix = "!adminbot"
 
 // This is where all of our commands will be handled
 export default class Bot {
@@ -95,6 +94,8 @@ export default class Bot {
           return await runListRoomsCommand(roomId, event, this.client, args[1])
         case PROMOTE_COMMAND:
           return await runPromoteCommand(roomId, event, args, this.client, this.userId)
+        case DELETE_ROOM_COMMAND:
+          return await runDeleteRoomCommand(roomId, event, args, this.client, event.sender)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }
