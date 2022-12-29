@@ -95,7 +95,7 @@ export default class Bot {
         case PROMOTE_COMMAND:
           return await runPromoteCommand(roomId, event, args, this.client, this.userId)
         case DELETE_ROOM_COMMAND:
-          return await runDeleteRoomCommand(roomId, event, args, this.client, event.sender)
+          return await runDeleteRoomCommand(roomId, event, args, this.client)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }

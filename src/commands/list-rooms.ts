@@ -1,7 +1,7 @@
 import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
 import { groupedRooms } from "src/config/rooms"
-import { sendMessage } from "src/utils"
+import { sendMessage, CommandError, canExecuteCommand } from "src/utils"
 
 export const LIST_ROOMS_COMMAND = "list-rooms"
 
@@ -11,6 +11,12 @@ export async function runListRoomsCommand(
   client: MatrixClient,
   inputGroup?: string,
 ): Promise<string> {
+  // Ensure the user can execute the command
+  const canExecute = await canExecuteCommand(event.sender, roomId)
+  if (!canExecute) {
+    throw new CommandError(`Access denied`)
+  }
+
   // use all groups unless provided group as inputGroup
   const neededGroups = inputGroup ? groupedRooms.filter((g) => g.groupName === inputGroup) : groupedRooms
   // outputs a list of room names per group

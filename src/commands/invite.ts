@@ -2,7 +2,7 @@ import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "mat
 import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
 import { groupedRooms } from "src/config/rooms"
-import { CommandError, sendMessage, sleep } from "src/utils"
+import { CommandError, sendMessage, sleep, canExecuteCommand } from "src/utils"
 import config from "src/config/env"
 
 
@@ -20,6 +20,12 @@ export async function runInviteCommand(
   args: string[],
   client: MatrixClient,
 ): Promise<string> {
+  // Ensure the user can execute the command
+  const canExecute = await canExecuteCommand(event.sender, roomId)
+  if (!canExecute) {
+    throw new CommandError(`Access denied`)
+  }
+
   const [, userId, ...userGroups] = args
   const groups: string[] = userGroups?.length ? userGroups : defaultGroups
   const username: string = await getUserDisplayName(client, userId)

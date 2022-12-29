@@ -1,5 +1,8 @@
 import { MatrixClient } from "matrix-bot-sdk"
 
+import config from "src/config/env"
+import { adminApi } from "src/admin-api"
+
 
 export class CommandError extends Error {}
 
@@ -46,4 +49,15 @@ export class TemporaryState<StateRecord> {
     this.clearUp()
     delete this.state[key]
   }
+}
+
+export async function canExecuteCommand(userId: string, roomId: string, targetRoomId?: string): Promise<boolean> {
+  if (config.ADMIN_ROOM_ID === roomId) {
+    return true
+  } else if (targetRoomId) {
+    const powerLevelsEvent = await adminApi.getRoomPowerLevelsEvent(targetRoomId)
+    const powerLevel = powerLevelsEvent?.content.users[userId] || 0
+    return powerLevel === 100
+  }
+  return false
 }

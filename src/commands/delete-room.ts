@@ -2,7 +2,7 @@ import { MatrixClient, MessageEvent, MessageEventContent, LogService, RichReply 
 import htmlEscape from "escape-html"
 
 import config from "src/config/env"
-import { CommandError, sendMessage, TemporaryState } from "src/utils"
+import { CommandError, sendMessage, TemporaryState, canExecuteCommand } from "src/utils"
 import { adminApi } from "src/admin-api"
 import { commandPrefix } from "src/constants"
 
@@ -21,17 +21,16 @@ export async function runDeleteRoomCommand(
   event: MessageEvent<MessageEventContent>,
   args: string[],
   client: MatrixClient,
-  senderUserId: string,
 ): Promise<string> {
   // 0. Perform room deletion (after confirmation)
   if (args[1] === DELTE_ROOM_CONFIRMATION_FLAG) {
-    const request = tempState.get(senderUserId)
+    const request = tempState.get(event.sender)
     if (!request) {
       throw new CommandError(
         `There is nothing to confirm. It is possible that your room deletion request has expired. Please run the command for deleting the room again.`,
       )
     }
-    tempState.delete(senderUserId)
+    tempState.delete(event.sender)
     await sendMessage(client, roomId, `Beginning the process of removing the room "${request.roomName}"...`)
     let deletionResponse
     try {
@@ -52,7 +51,7 @@ export async function runDeleteRoomCommand(
 
   // 1. Retrive and validate arguments
   const [, targetRoomId] = args
-  if (!senderUserId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+  if (!event.sender.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     throw new CommandError(`Access denied.`)
   }
   if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
@@ -62,7 +61,13 @@ export async function runDeleteRoomCommand(
     )
   }
 
-  // 2. Retrieve room details
+  // 2. Ensure the user can execute the command
+  const canExecute = await canExecuteCommand(event.sender, roomId, targetRoomId)
+  if (!canExecute) {
+    throw new CommandError(`Access denied`)
+  }
+
+  // 3. Retrieve room details
   let room: any = null
   try {
     room = await adminApi.getRoomInfo(targetRoomId)
@@ -74,8 +79,8 @@ export async function runDeleteRoomCommand(
     throw new CommandError(`The room "${targetRoomId}" cannot be found.`)
   }
 
-  // 3. Prompt the user if they're sure to delete the room
-  tempState.set(senderUserId, { roomId: targetRoomId, roomName: room.name })
+  // 4. Prompt the user if they're sure to delete the room
+  tempState.set(event.sender, { roomId: targetRoomId, roomName: room.name })
   const command = `${commandPrefix} ${DELETE_ROOM_COMMAND} ${DELTE_ROOM_CONFIRMATION_FLAG}`
   const html = `Are you sure you want to remove the room "${
     room.name
