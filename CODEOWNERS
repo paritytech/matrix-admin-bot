@@ -21,4 +21,4 @@
 
 # CI
 /.gitlab-ci.yml @paritytech/ci @paritytech/business-automation
-/helm @paritytech/devops @paritytech/business-automation
+/helm @paritytech/ci @paritytech/business-automation
