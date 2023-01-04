@@ -2,12 +2,12 @@ import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
 import config from "src/config/env"
-import { commandPrefix } from "src/bot"
-import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
+import { commandPrefix } from "src/constants"
 import { groupedRooms } from "src/config/rooms"
-
-import { defaultGroups, INVITE_COMMAND } from "./invite"
-import { PROMOTE_COMMAND } from "./promote"
+import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
+import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
+import { PROMOTE_COMMAND } from "src/commands/promote"
+import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
 
 export async function runHelpCommand(
   roomId: string,
@@ -52,6 +52,12 @@ ${commandPrefix} ${PROMOTE_COMMAND} <userId> <roomId> <powerLevel>
     Examples:
     - "${commandPrefix} ${PROMOTE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN} 99" - promote the user to level 99
     - "${commandPrefix} ${PROMOTE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} #pupps:${config.MATRIX_SERVER_DOMAIN} moderator" - promote the user to moderator level (50)
+
+--------------------------------------------------
+
+${commandPrefix} ${DELETE_ROOM_COMMAND} <roomId>
+    Kick all room members and completely delete the room.
+    <roomId>     - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} or #roomAlias:${config.MATRIX_SERVER_DOMAIN}
 
 --------------------------------------------------
 

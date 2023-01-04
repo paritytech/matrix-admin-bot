@@ -1,6 +1,6 @@
 import { MatrixClient, MessageEvent, MessageEventContent, MembershipEvent } from "matrix-bot-sdk"
 
-import { CommandError, sendMessage, sleep } from "src/utils"
+import { CommandError, sendMessage, canExecuteCommand } from "src/utils"
 import config from "src/config/env"
 
 
@@ -46,6 +46,12 @@ export async function runPromoteCommand(
     throw new CommandError(
       `Invalid power level argument. It should be a number (0-100). Provided value: "${powerLevelArg}".`,
     )
+  }
+
+  // 2. Ensure the user can execute the command
+  const canExecute = await canExecuteCommand(event.sender, roomId, targetRoomId)
+  if (!canExecute) {
+    throw new CommandError(`Access denied`)
   }
 
   // 2. Check if the room exists
