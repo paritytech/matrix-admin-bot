@@ -11,7 +11,7 @@ import { commandPrefix } from "src/constants"
 
 /* This is the maximum allowed time between time on matrix server
    and time when bot caught event */
-const MAX_TIMEOUT_MS = 1000
+const MAX_TIMEOUT_MS = 4000
 
 const moduleName = "CommandHandler"
 
@@ -60,20 +60,21 @@ export default class Bot {
     if (event.isRedacted) return // Ignore redacted events that come through
     if (event.sender === this.userId) return // Ignore ourselves
     if (event.messageType !== "m.text") return // Ignore non-text messages
-    // Ignore old messages, which may have sent when bot wasn't online
-    if (Date.now() - event.timestamp > MAX_TIMEOUT_MS) {
-      LogService.info(moduleName, "Skip message by timeout: " + JSON.stringify(event))
-
-      return
-    }
-
-    LogService.debug(moduleName, event)
 
     /* Ensure that the event is a command before going on. We allow people to ping
            the bot as well as using our COMMAND_PREFIX. */
     const prefixes = [commandPrefix, `${this.localpart}:`, `${this.displayName}:`, `${this.userId}:`]
     const prefixUsed = prefixes.find((p) => event.textBody.startsWith(p))
     if (!prefixUsed) return // Not a command (as far as we're concerned)
+
+    // Ignore old messages, which may have sent when bot wasn't online
+    const delay = Date.now() - event.timestamp
+    if (delay > MAX_TIMEOUT_MS) {
+      LogService.info(moduleName, `Skip message by timeout (${delay}ms delay): ` + JSON.stringify(event))
+      return
+    }
+
+    LogService.debug(moduleName, event)
 
     // Check to see what the arguments were to the command
     const args = event.textBody
