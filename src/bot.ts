@@ -1,20 +1,20 @@
 import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } from "matrix-bot-sdk"
 
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
+import { commandPrefix } from "src/constants"
 
+import { DEACTIVATE_USER_COMMAND, runDeactivateUserCommand } from "./commands/deactivate-user"
+import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
 import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
-import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
 import { CommandError } from "./utils"
-import { commandPrefix } from "src/constants"
 
 /* This is the maximum allowed time between time on matrix server
    and time when bot caught event */
 const MAX_TIMEOUT_MS = 4000
 
 const moduleName = "CommandHandler"
-
 
 // This is where all of our commands will be handled
 export default class Bot {
@@ -97,6 +97,8 @@ export default class Bot {
           return await runPromoteCommand(roomId, event, args, this.client, this.userId)
         case DELETE_ROOM_COMMAND:
           return await runDeleteRoomCommand(roomId, event, args, this.client)
+        case DEACTIVATE_USER_COMMAND:
+          return await runDeactivateUserCommand(roomId, event, args, this.client)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }

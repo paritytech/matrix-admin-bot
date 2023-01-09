@@ -1,13 +1,14 @@
 import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
-import config from "src/config/env"
-import { commandPrefix } from "src/constants"
-import { groupedRooms } from "src/config/rooms"
-import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
-import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
-import { PROMOTE_COMMAND } from "src/commands/promote"
+import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
+import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
+import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
+import { PROMOTE_COMMAND } from "src/commands/promote"
+import config from "src/config/env"
+import { groupedRooms } from "src/config/rooms"
+import { commandPrefix } from "src/constants"
 
 export async function runHelpCommand(
   roomId: string,
@@ -58,6 +59,22 @@ ${commandPrefix} ${PROMOTE_COMMAND} <userId> <roomId> <powerLevel>
 ${commandPrefix} ${DELETE_ROOM_COMMAND} <roomId>
     Kick all room members and completely delete the room.
     <roomId>     - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} or #roomAlias:${config.MATRIX_SERVER_DOMAIN}
+
+    Example:
+    - "${commandPrefix} ${DELETE_ROOM_COMMAND} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}" - delete the room
+
+--------------------------------------------------
+
+${commandPrefix} ${DEACTIVATE_USER_COMMAND} <userId> [recover]
+    Deactivate a user's account. It removes active access tokens, resets the password, and deletes third-party IDs (to prevent the user requesting a password reset).
+    Messages sent by the user will still be visible by anyone that was in the room when these messages were sent, but hidden from users joining the room afterwards.
+
+    <userId>     - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN}
+    [recover]    - (Optional) flag for user account activation. The bot will provide a new random user password.
+
+    Examples:
+    - "${commandPrefix} ${DEACTIVATE_USER_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN}" - deactivate the user
+    - "${commandPrefix} ${DEACTIVATE_USER_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} recover" - activate user with password reset
 
 --------------------------------------------------
 

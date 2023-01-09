@@ -1,11 +1,13 @@
-import { MatrixClient, MessageEvent, MessageEventContent, LogService, RichReply } from "matrix-bot-sdk"
 import htmlEscape from "escape-html"
+import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
-import config from "src/config/env"
-import { CommandError, sendMessage, TemporaryState, canExecuteCommand } from "src/utils"
 import { adminApi } from "src/admin-api"
+import { RoomInfoResponse } from "src/admin-api/types"
+import config from "src/config/env"
 import { commandPrefix } from "src/constants"
+import { canExecuteCommand, CommandError, sendMessage, TemporaryState } from "src/utils"
 
+const moduleName = "DeleteRoomCommand"
 export const DELETE_ROOM_COMMAND = "delete-room"
 const DELTE_ROOM_CONFIRMATION_FLAG = "confirm"
 const DELETE_ROOM_CONFIRMATION_DELAY_MINUTES = 2
@@ -36,7 +38,7 @@ export async function runDeleteRoomCommand(
     try {
       deletionResponse = await adminApi.deleteRoom(request.roomId)
     } catch (e) {
-      LogService.error(e)
+      LogService.error(moduleName, e)
       throw new CommandError(`Unable to delete the room. An error has occurred.`)
     }
     const kickedUserIds = deletionResponse.kicked_users
@@ -46,7 +48,7 @@ export async function runDeleteRoomCommand(
         ? `<br /><br />Failed to kick users:<br/><pre>${failedToKickUserIds.join("\n")}</pre>`
         : ""
     }${kickedUserIds.length ? `<br /><br />Kicked users:<br /><pre>${kickedUserIds.join("\n")}</pre>` : ""}`
-    return client.sendHtmlText(roomId, html)
+    return await client.sendHtmlText(roomId, html)
   }
 
   // 1. Retrive and validate arguments
@@ -68,11 +70,11 @@ export async function runDeleteRoomCommand(
   }
 
   // 3. Retrieve room details
-  let room: any = null
+  let room: RoomInfoResponse | null = null
   try {
     room = await adminApi.getRoomInfo(targetRoomId)
   } catch (e) {
-    LogService.error(e)
+    LogService.error(moduleName, e)
     throw new CommandError(`Unable to retrieve room details.`)
   }
   if (!room) {
@@ -87,5 +89,5 @@ export async function runDeleteRoomCommand(
   }" completely?<br />To proceed with the deletion, please reply with the following command within ${DELETE_ROOM_CONFIRMATION_DELAY_MINUTES} minute${
     DELETE_ROOM_CONFIRMATION_DELAY_MINUTES > 1 ? "s" : ""
   }:<br /><code>${htmlEscape(command)}</code>`
-  return client.sendHtmlText(roomId, html)
+  return await client.sendHtmlText(roomId, html)
 }

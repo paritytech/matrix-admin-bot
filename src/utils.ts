@@ -1,8 +1,8 @@
 import { MatrixClient } from "matrix-bot-sdk"
+import { nanoid } from "nanoid"
 
-import config from "src/config/env"
 import { adminApi } from "src/admin-api"
-
+import config from "src/config/env"
 
 export class CommandError extends Error {}
 
@@ -19,7 +19,7 @@ export function sendMessage(client: MatrixClient, roomId: string, message: strin
 
 type TemporaryStateProps = { ttl?: number }
 export class TemporaryState<StateRecord> {
-  state: Record<string, { timestamp: number, value: StateRecord }> = {}
+  state: Record<string, { timestamp: number; value: StateRecord }> = {}
   ttl = 1e3 * 60 * 3 // 3 min
   constructor(props: TemporaryStateProps) {
     if (props.ttl) {
@@ -28,7 +28,7 @@ export class TemporaryState<StateRecord> {
   }
   private clearUp() {
     const now = Date.now()
-    const newState: Record<string, { timestamp: number, value: StateRecord }> = {}
+    const newState: Record<string, { timestamp: number; value: StateRecord }> = {}
     for (const key in this.state) {
       const record = this.state[key]
       if (now - record.timestamp < this.ttl) {
@@ -37,15 +37,15 @@ export class TemporaryState<StateRecord> {
     }
     this.state = newState
   }
-  public set(key: string, value: StateRecord) {
+  public set(key: string, value: StateRecord): void {
     this.clearUp()
     this.state[key] = { timestamp: Date.now(), value }
   }
   public get(key: string): StateRecord | null {
     const record = this.state[key]
-    return record ? record.value : null
+    return record !== undefined ? record.value : null
   }
-  public delete(key: string) {
+  public delete(key: string): void {
     this.clearUp()
     delete this.state[key]
   }
@@ -60,4 +60,8 @@ export async function canExecuteCommand(userId: string, roomId: string, targetRo
     return powerLevel === 100
   }
   return false
+}
+
+export function generatePassword(): string {
+  return nanoid(16)
 }
