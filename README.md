@@ -5,6 +5,8 @@ which runs bulk invite to the channels new users
 Initial [tool request](https://github.com/paritytech/opstooling/issues/14)
 Eng requirements [doc](https://docs.google.com/document/d/1wOUP6AX4XKBzaeu8MKgm269DaUg2FGwjBQ7RQpKarQY/edit)
 
+[![GitHub Issue Sync](https://github.com/paritytech/matrix-admin-bot/actions/workflows/github-issue-sync.yml/badge.svg)](https://github.com/paritytech/matrix-admin-bot/actions/workflows/github-issue-sync.yml)
+
 ## Running / Building
 
 2. Update your project's details in `package.json`.
