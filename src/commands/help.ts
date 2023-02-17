@@ -41,7 +41,7 @@ ${commandPrefix} ${INVITE_COMMAND} <userId> [<group>]
 --------------------------------------------------
 
 ${commandPrefix} ${BULK_INVITE_COMMAND} <roomId>
-    Invite all user from the current server into a given room.
+    Invite all members of the current server to a given room.
     Disabled, banned, and non Google SSO users will be ignored.
     <roomId>    - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
 
