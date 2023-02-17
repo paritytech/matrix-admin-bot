@@ -8,6 +8,8 @@ import {
   RoomMembersResponse,
   RoomPowerLevelsEvent,
   UserAccountResponse,
+  UserAccountShort,
+  UserAccountsResponse,
 } from "./types"
 
 class AdminApi {
@@ -92,6 +94,23 @@ class AdminApi {
       }
       throw err
     }
+  }
+
+  async getUserAccounts(): Promise<UserAccountShort[]> {
+    const limit = 50
+    let users: UserAccountShort[] = []
+    let nextToken: string | null = null
+    let total: number | null = null
+    do {
+      const result = (await this.makeRequest(
+        "GET",
+        `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false`,
+      )) as UserAccountsResponse
+      users = users.concat(result.users)
+      nextToken = result.next_token || null
+      total = result.total
+    } while (nextToken !== null || users.length < total)
+    return users
   }
 }
 

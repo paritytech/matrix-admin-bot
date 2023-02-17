@@ -39,7 +39,7 @@ export type RoomPowerLevelsEvent = {
     state_default: number
     users: Record<string, number>
     users_default: number
-  },
+  }
   origin_server_ts: number
   room_id: string
   sender: string
@@ -47,40 +47,60 @@ export type RoomPowerLevelsEvent = {
   type: string
   unsigned: {
     age: number
-  },
+  }
   event_id: string
   user_id: string
   age: number
 }
 
 export type RoomMembersResponse = {
-  members: string[],
+  members: string[]
   total: number
 }
 
 export type UserAccountResponse = {
-  name: string,
+  name: string
   displayname: string | null
-  threepids: Array<{
-    medium: string,
-    address: string,
-    added_at: number,
-    validated_at: number,
-  }>
+  threepids: {
+    medium: string
+    address: string
+    added_at: number
+    validated_at: number
+  }[]
   avatar_url: string | null
-  is_guest: number,
+  is_guest: number
   admin: number
   deactivated: number
-  erased: boolean,
+  erased: boolean
   shadow_banned: number
-  creation_ts: number,
-  appservice_id: string | null,
-  consent_server_notice_sent: string | null,
-  consent_version: string | null,
-  consent_ts: string | null,
-  external_ids: Array<{
+  creation_ts: number
+  appservice_id: string | null
+  consent_server_notice_sent: string | null
+  consent_version: string | null
+  consent_ts: string | null
+  external_ids: {
     auth_provider: string
     external_id: string
-  }>
-  user_type: string | null,
+  }[]
+  user_type: string | null
+}
+
+export type UserAccountShort = Pick<
+  UserAccountResponse,
+  | "name"
+  | "is_guest"
+  | "admin"
+  | "user_type"
+  | "deactivated"
+  | "erased"
+  | "shadow_banned"
+  | "displayname"
+  | "avatar_url"
+  | "creation_ts"
+>
+
+export type UserAccountsResponse = {
+  users: UserAccountShort[]
+  next_token: string
+  total: number
 }

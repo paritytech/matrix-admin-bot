@@ -1,6 +1,7 @@
 import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
+import { BULK_INVITE_COMMAND } from "src/commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
 import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
@@ -34,8 +35,18 @@ ${commandPrefix} ${INVITE_COMMAND} <userId> [<group>]
                 To see all rooms & groups - write "${commandPrefix} invite list-rooms"
 
     Examples:
-    - "${commandPrefix} invite @username:${config.MATRIX_SERVER_DOMAIN}" - invite user to default ${allRoomGroups}
-    - "${commandPrefix} invite @username:${config.MATRIX_SERVER_DOMAIN} common opstooling" - custom groups
+    - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN}" - invite user to default ${allRoomGroups}
+    - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} common opstooling" - custom groups
+
+--------------------------------------------------
+
+${commandPrefix} ${BULK_INVITE_COMMAND} <roomId>
+    Invite all user from the current server into a given room.
+    Disabled, banned, and non Google SSO users will be ignored.
+    <roomId>    - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+
+    Examples:
+    - "${commandPrefix} ${BULK_INVITE_COMMAND} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}"
 
 --------------------------------------------------
 

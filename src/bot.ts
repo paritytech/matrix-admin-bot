@@ -3,6 +3,7 @@ import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } fro
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
 import { commandPrefix } from "src/constants"
 
+import { BULK_INVITE_COMMAND, runBulkInviteCommand } from "./commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND, runDeactivateUserCommand } from "./commands/deactivate-user"
 import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
 import { runHelpCommand } from "./commands/help"
@@ -91,6 +92,8 @@ export default class Bot {
       switch (command) {
         case INVITE_COMMAND:
           return await runInviteCommand(roomId, event, args, this.client)
+        case BULK_INVITE_COMMAND:
+          return await runBulkInviteCommand(roomId, event, args, this.client)
         case LIST_ROOMS_COMMAND:
           return await runListRoomsCommand(roomId, event, this.client, args[1])
         case PROMOTE_COMMAND:
