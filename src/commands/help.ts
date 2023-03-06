@@ -5,6 +5,7 @@ import { BULK_INVITE_COMMAND } from "src/commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
 import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
+import { LIST_ALL_ROOMS_COMMAND } from "src/commands/list-all-rooms"
 import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
 import { PROMOTE_COMMAND } from "src/commands/promote"
 import config from "src/config/env"
@@ -23,6 +24,11 @@ ${commandPrefix} ${LIST_ROOMS_COMMAND} [<group>]
     Show the list of available groups & rooms
     [<group>]   - (Optional) group(s) of rooms to invite user (space separated)
                 Available groups: ${allRoomGroups}
+
+--------------------------------------------------
+
+${commandPrefix} ${LIST_ALL_ROOMS_COMMAND}
+    Show the list of all rooms and spaces on the current server in CSV format
 
 --------------------------------------------------
 

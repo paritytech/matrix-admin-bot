@@ -20,6 +20,32 @@ export type RoomInfoResponse = {
   forgotten: boolean
 }
 
+export type RoomInfoShort = Pick<
+  RoomInfoResponse,
+  | "room_id"
+  | "name"
+  | "canonical_alias"
+  | "joined_members"
+  | "joined_local_members"
+  | "version"
+  | "creator"
+  | "encryption"
+  | "federatable"
+  | "public"
+  | "join_rules"
+  | "guest_access"
+  | "history_visibility"
+  | "state_events"
+  | "room_type"
+>
+
+export type ListRoomResponse = {
+  rooms: RoomInfoShort[]
+  total_rooms: number
+  next_batch?: number
+  prev_batch?: number
+}
+
 export type RoomDeletionResponse = {
   kicked_users: string[]
   failed_to_kick_users: string[]

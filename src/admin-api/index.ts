@@ -1,10 +1,13 @@
 import axios from "axios"
 
 import config from "src/config/env"
+import { sleep } from "src/utils"
 
 import {
+  ListRoomResponse,
   RoomDeletionResponse,
   RoomInfoResponse,
+  RoomInfoShort,
   RoomMembersResponse,
   RoomPowerLevelsEvent,
   UserAccountResponse,
@@ -102,6 +105,7 @@ class AdminApi {
     let nextToken: string | null = null
     let total: number | null = null
     do {
+      await sleep(300)
       const result = (await this.makeRequest(
         "GET",
         `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false`,
@@ -111,6 +115,26 @@ class AdminApi {
       total = result.total
     } while (nextToken !== null || users.length < total)
     return users
+  }
+
+  async getRooms(): Promise<RoomInfoShort[]> {
+    const limit = 50
+    let rooms: RoomInfoShort[] = []
+    let loop: number = 0
+    let from: string | null = null
+    let total: number | null = null
+    do {
+      await sleep(300)
+      const result = (await this.makeRequest(
+        "GET",
+        `/v1/rooms?limit=${limit}${from ? `&from=${from}` : ``}`,
+      )) as ListRoomResponse
+      loop++
+      rooms = rooms.concat(result.rooms)
+      from = String(loop * limit)
+      total = result.total_rooms
+    } while (loop * limit <= total)
+    return rooms
   }
 }
 
