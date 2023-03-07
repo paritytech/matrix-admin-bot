@@ -1,7 +1,6 @@
 import axios from "axios"
 
 import config from "src/config/env"
-import { sleep } from "src/utils"
 
 import {
   ListRoomResponse,
@@ -105,7 +104,6 @@ class AdminApi {
     let nextToken: string | null = null
     let total: number | null = null
     do {
-      await sleep(300)
       const result = (await this.makeRequest(
         "GET",
         `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false`,
@@ -124,7 +122,6 @@ class AdminApi {
     let from: string | null = null
     let total: number | null = null
     do {
-      await sleep(300)
       const result = (await this.makeRequest(
         "GET",
         `/v1/rooms?limit=${limit}${from ? `&from=${from}` : ``}`,

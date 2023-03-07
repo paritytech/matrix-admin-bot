@@ -14,18 +14,19 @@ export interface Environment {
   DATA_PATH: string
   LOG_LEVEL: LogLevel
   INVITE_ROOMS_LIST: GroupOfRooms[]
+  USER_AUTH_PROVIDER: string
 }
 
-// By default, Joi expects all .env parameters as string
-// In case we pass JSON, that should be converted to Object/Array explicitly
+/* By default, Joi expects all .env parameters as string
+   In case we pass JSON, that should be converted to Object/Array explicitly */
 const JoiJSON = Joi.extend({
   type: "array",
   base: Joi.array(),
   coerce: {
     from: "string",
     method: (value: string) => {
-      // check if the given string starts with array bracket [ "1", "2", ... ]
-      // otherwise return raw value
+      /* check if the given string starts with array bracket [ "1", "2", ... ]
+         otherwise return raw value */
       if (value[0] !== "[" && !/^\s*(\[)/.test(value)) {
         return { value }
       }
@@ -58,6 +59,7 @@ const environmentSchema = Joi.object<Environment>({
     )
     .min(1)
     .required(),
+  USER_AUTH_PROVIDER: Joi.string().required(),
 })
 
 const { value, error } = environmentSchema.validate(process.env, { stripUnknown: true })

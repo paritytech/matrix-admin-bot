@@ -11,7 +11,6 @@ const moduleName = "BulkInviteCommand"
 export const BULK_INVITE_COMMAND = "bulk-invite"
 const CONFIRMATION_FLAG = "confirm"
 const CONFIRMATION_DELAY_MINUTES = 2
-const AUTH_PROVIDER_TYPE = "google"
 const REQUEST_DELAY_SECONDS = 0.3
 
 type State = {
@@ -19,6 +18,16 @@ type State = {
   roomName: string
 }
 const tempState = new TemporaryState<State>({ ttl: 1e3 * 60 * CONFIRMATION_DELAY_MINUTES })
+
+function chunkBy(value: string, maxLength: number, separator = "\n"): string[] {
+  const lines = value.split(separator)
+  const result = []
+  for (let i = 0; i < lines.length; i += maxLength) {
+    const chunk = lines.slice(i, i + maxLength).join(separator)
+    result.push(chunk)
+  }
+  return result
+}
 
 export async function runBulkInviteCommand(
   roomId: string,
@@ -77,11 +86,25 @@ export async function runBulkInviteCommand(
       }
     }
 
-    const html = `Done! Successfully invited ${report.succeedInvites.length} users to the room "${request.roomName}".${
-      report.failedInvites.length ? ` Failed to invite ${report.failedInvites.length} users.` : ""
-    }<br /><pre>${report.failedInvites.concat(report.succeedInvites).join("\n")}</pre>`
+    const reportContent = report.failedInvites.concat(report.succeedInvites).join("\n")
+    const reportContentChunks = chunkBy(reportContent, 100, "\n")
 
-    return await client.sendHtmlText(roomId, html)
+    await sendMessage(
+      client,
+      roomId,
+      `Done! Successfully invited ${report.succeedInvites.length} users to the room "${request.roomName}".${
+        report.failedInvites.length ? ` Failed to invite ${report.failedInvites.length} users.` : ""
+      }`,
+    )
+
+    for (const [i, chunk] of reportContentChunks.entries()) {
+      await client.sendHtmlText(
+        roomId,
+        `Command execution report ${i + 1}/${reportContentChunks.length}<br /><pre>${chunk}</pre>`,
+      )
+    }
+
+    return ""
   }
 
   // 1. Retrive and validate arguments
@@ -140,8 +163,8 @@ async function validateUserAuthProvider(userId: string): Promise<void> {
   if (
     !account ||
     !account.external_ids?.length ||
-    !account.external_ids.some((x) => x.auth_provider === AUTH_PROVIDER_TYPE)
+    !account.external_ids.some((x) => x.auth_provider === config.USER_AUTH_PROVIDER)
   ) {
-    throw new CommandError(`Wrong authentication provider. Should be "${AUTH_PROVIDER_TYPE}"`)
+    throw new CommandError(`Wrong authentication provider. Should be "${config.USER_AUTH_PROVIDER}"`)
   }
 }
