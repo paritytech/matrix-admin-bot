@@ -5,13 +5,12 @@ import { adminApi } from "src/admin-api"
 import { RoomInfoResponse } from "src/admin-api/types"
 import config from "src/config/env"
 import { commandPrefix } from "src/constants"
-import { canExecuteCommand, CommandError, sendMessage, sleep, TemporaryState } from "src/utils"
+import { canExecuteCommand, CommandError, sendMessage, TemporaryState } from "src/utils"
 
 const moduleName = "BulkInviteCommand"
 export const BULK_INVITE_COMMAND = "bulk-invite"
 const CONFIRMATION_FLAG = "confirm"
 const CONFIRMATION_DELAY_MINUTES = 2
-const REQUEST_DELAY_SECONDS = 0.3
 
 type State = {
   roomId: string
@@ -53,15 +52,7 @@ export async function runBulkInviteCommand(
     } catch (err) {
       throw new CommandError(`Failed to retrieve user accounts`)
     }
-    await sendMessage(
-      client,
-      roomId,
-      `Starting to invite ${users.length} users to the "${
-        request.roomName
-      }" room. The estimated time for the command to complete is ${Math.ceil(
-        users.length * REQUEST_DELAY_SECONDS,
-      )} seconds.`,
-    )
+    await sendMessage(client, roomId, `Starting to invite ${users.length} users to the "${request.roomName}" room.`)
 
     // Iterate over users
     type CommandReport = { failedInvites: string[]; succeedInvites: string[]; skippedInvitesNumber: number }
@@ -72,7 +63,6 @@ export async function runBulkInviteCommand(
         await client.inviteUser(user.name, request.roomId)
         report.succeedInvites.push(`✓ Successfully invited ${user.name}`)
         LogService.info(moduleName, `Invited ${user.name} to room "${request.roomName}" (${request.roomId})`)
-        await sleep(REQUEST_DELAY_SECONDS * 1e3)
       } catch (e) {
         let errorMessage = ""
         if (e instanceof CommandError) {
