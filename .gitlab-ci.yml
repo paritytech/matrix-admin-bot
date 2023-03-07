@@ -149,6 +149,7 @@ deploy-stg:
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-stg
+    USER_AUTH_PROVIDER:            "oidc-google-parity-lab"
   tags:
     - matrix-admin-bot-stg
 
@@ -160,5 +161,6 @@ deploy-prod:
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-prod
+    USER_AUTH_PROVIDER:            "oidc-google-parity-comms"
   tags:
     - matrix-admin-bot-prod
