@@ -64,8 +64,8 @@ export async function runBulkInviteCommand(
     )
 
     // Iterate over users
-    type CommandReport = { failedInvites: string[]; succeedInvites: string[] }
-    const report: CommandReport = { failedInvites: [], succeedInvites: [] }
+    type CommandReport = { failedInvites: string[]; succeedInvites: string[]; skippedInvitesNumber: number }
+    const report: CommandReport = { failedInvites: [], succeedInvites: [], skippedInvitesNumber: 0 }
     for (const user of users) {
       try {
         await validateUserAuthProvider(user.name)
@@ -82,20 +82,35 @@ export async function runBulkInviteCommand(
         } else {
           errorMessage = `unknown problem`
         }
-        report.failedInvites.push(`✕ Failed to invite ${user.name} | ` + errorMessage)
+        if (errorMessage.endsWith("is already in the room.")) {
+          report.skippedInvitesNumber++
+        } else {
+          report.failedInvites.push(`✕ Failed to invite ${user.name} | ` + errorMessage)
+        }
       }
     }
-
-    const reportContent = report.failedInvites.concat(report.succeedInvites).join("\n")
-    const reportContentChunks = chunkBy(reportContent, 100, "\n")
 
     await sendMessage(
       client,
       roomId,
-      `Done! Successfully invited ${report.succeedInvites.length} users to the room "${request.roomName}".${
-        report.failedInvites.length ? ` Failed to invite ${report.failedInvites.length} users.` : ""
-      }`,
+      [
+        `Done! Successfully invited ${report.succeedInvites.length} users to the room "${request.roomName}".`,
+        report.skippedInvitesNumber
+          ? `${report.skippedInvitesNumber} user${
+              report.skippedInvitesNumber === 1 ? " is" : "s are"
+            } already in the room.`
+          : null,
+        report.failedInvites.length ? `Failed to invite ${report.failedInvites.length} users` : null,
+      ]
+        .filter(Boolean)
+        .join(" "),
     )
+
+    const reportContent = report.failedInvites.concat(report.succeedInvites).join("\n")
+    if (!reportContent) {
+      return ""
+    }
+    const reportContentChunks = chunkBy(reportContent, 100, "\n")
 
     for (const [i, chunk] of reportContentChunks.entries()) {
       await client.sendHtmlText(
