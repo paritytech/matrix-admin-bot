@@ -1,7 +1,7 @@
 import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } from "matrix-bot-sdk"
 
-import { LIST_ALL_ROOMS_COMMAND, runListAllRoomsCommand } from "src/commands/list-all-rooms"
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
+import { LIST_SPACES_COMMAND, runListSpacesCommand } from "src/commands/list-spaces"
 import { commandPrefix } from "src/constants"
 
 import { BULK_INVITE_COMMAND, runBulkInviteCommand } from "./commands/bulk-invite"
@@ -97,8 +97,8 @@ export default class Bot {
           return await runBulkInviteCommand(roomId, event, args, this.client)
         case LIST_ROOMS_COMMAND:
           return await runListRoomsCommand(roomId, event, this.client, args[1])
-        case LIST_ALL_ROOMS_COMMAND:
-          return await runListAllRoomsCommand(roomId, event, this.client)
+        case LIST_SPACES_COMMAND:
+          return await runListSpacesCommand(roomId, event, this.client)
         case PROMOTE_COMMAND:
           return await runPromoteCommand(roomId, event, args, this.client, this.userId)
         case DELETE_ROOM_COMMAND:

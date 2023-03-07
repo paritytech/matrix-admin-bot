@@ -3,9 +3,9 @@ import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 import { adminApi } from "src/admin-api"
 import { canExecuteCommand, CommandError, sendMessage } from "src/utils"
 
-export const LIST_ALL_ROOMS_COMMAND = "list-all-rooms"
+export const LIST_SPACES_COMMAND = "list-spaces"
 
-export async function runListAllRoomsCommand(
+export async function runListSpacesCommand(
   roomId: string,
   event: MessageEvent<MessageEventContent>,
   client: MatrixClient,
@@ -22,20 +22,20 @@ export async function runListAllRoomsCommand(
   if (!rooms.length) {
     return await sendMessage(client, roomId, "No rooms found")
   }
+  const spaces = rooms.filter((x) => x.room_type === "m.space")
+  if (!spaces.length) {
+    return await sendMessage(client, roomId, "No spaces found")
+  }
 
   // Building result CSV
-  const csvHead = `id,name,alias,type,members,encryption,public`
-  const csvBody = rooms
+  const csvHead = `id,name,alias`
+  const csvBody = spaces
     .map((x) => {
       const alias = x.canonical_alias || "–"
       const name = x.name || "–"
-      const type = x.room_type === "m.space" ? "space" : "room"
-      const members = x.joined_members || 0
-      const encryption = String(Boolean(x.encryption))
-      const isPublic = String(x.public)
-      return `${x.room_id},${name},${alias},${type},${members},${encryption},${isPublic}`
+      return `${x.room_id},${name},${alias}`
     })
     .join("\n")
-  const html = `Rooms CSV:<br /><pre>${csvHead}\n${csvBody}</pre>`
+  const html = `Spaces CSV:<br /><pre>${csvHead}\n${csvBody}</pre>`
   return await client.sendHtmlText(roomId, html)
 }
