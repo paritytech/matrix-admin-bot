@@ -19,6 +19,7 @@ common:
     ACCESS_TOKEN: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#ACCESS_TOKEN
     INVITE_ROOMS_LIST: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#INVITE_ROOMS_LIST
     ADMIN_ROOM_ID: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#ADMIN_ROOM_ID
+    USER_AUTH_PROVIDER: ref+vault://kv/cicd/gitlab/parity/mirrors/matrix-admin-bot/parity-stg#USER_AUTH_PROVIDER
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: traefik-internal.parity-stg.parity.io.
