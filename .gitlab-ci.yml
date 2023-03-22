@@ -166,6 +166,8 @@ deploy-stg:
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-stg
+  environment:
+    name:                          parity-stg
   tags:
     - matrix-admin-bot-stg
 
@@ -177,5 +179,7 @@ deploy-prod:
   variables:
     CI_IMAGE:                      "paritytech/kubetools:3.5.3"
     ENVIRONMENT:                   parity-prod
+  environment:
+    name:                          parity-prod
   tags:
     - matrix-admin-bot-prod
