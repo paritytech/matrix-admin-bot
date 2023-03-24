@@ -2,7 +2,7 @@ import htmlEscape from "escape-html"
 import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
 import { adminApi } from "src/admin-api"
-import { RoomInfoResponse } from "src/admin-api/types"
+import { CommandReport, RoomInfoResponse } from "src/admin-api/types"
 import config from "src/config/env"
 import { commandPrefix } from "src/constants"
 import { canExecuteCommand, CommandError, sendMessage, TemporaryState } from "src/utils"
@@ -55,7 +55,6 @@ export async function runBulkInviteCommand(
     await sendMessage(client, roomId, `Starting to invite ${users.length} users to the "${request.roomName}" room.`)
 
     // Iterate over users
-    type CommandReport = { failedInvites: string[]; succeedInvites: string[]; skippedInvitesNumber: number }
     const report: CommandReport = { failedInvites: [], succeedInvites: [], skippedInvitesNumber: 0 }
     for (const user of users) {
       try {

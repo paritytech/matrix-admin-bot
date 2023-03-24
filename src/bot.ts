@@ -9,6 +9,7 @@ import { DEACTIVATE_USER_COMMAND, runDeactivateUserCommand } from "./commands/de
 import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
 import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
+import { INVITE_ROOM, runInviteRoomCommand } from "./commands/invite-room"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
 import { CommandError } from "./utils"
 
@@ -95,6 +96,8 @@ export default class Bot {
           return await runInviteCommand(roomId, event, args, this.client)
         case BULK_INVITE_COMMAND:
           return await runBulkInviteCommand(roomId, event, args, this.client)
+        case INVITE_ROOM:
+          return await runInviteRoomCommand(roomId, event, args, this.client, this.userId)
         case LIST_ROOMS_COMMAND:
           return await runListRoomsCommand(roomId, event, this.client, args[1])
         case LIST_SPACES_COMMAND:

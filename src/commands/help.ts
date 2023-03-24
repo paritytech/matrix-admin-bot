@@ -11,6 +11,7 @@ import { PROMOTE_COMMAND } from "src/commands/promote"
 import config from "src/config/env"
 import { groupedRooms } from "src/config/rooms"
 import { commandPrefix } from "src/constants"
+import { INVITE_ROOM } from "./invite-room"
 
 export async function runHelpCommand(
   roomId: string,
@@ -53,6 +54,16 @@ ${commandPrefix} ${BULK_INVITE_COMMAND} <roomId>
 
     Examples:
     - "${commandPrefix} ${BULK_INVITE_COMMAND} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}"
+
+--------------------------------------------------
+
+${commandPrefix} ${INVITE_ROOM} <roomId>
+    Invite all members from the current room to the room specified by roomId.
+    Disabled, banned, and non Google SSO users will be ignored.
+    <roomId>    - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+
+    Examples:
+    - "${commandPrefix} ${INVITE_ROOM} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}"
 
 --------------------------------------------------
 

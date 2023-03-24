@@ -3,6 +3,7 @@ import { nanoid } from "nanoid"
 
 import { adminApi } from "src/admin-api"
 import config from "src/config/env"
+import { CommandReport } from "./admin-api/types"
 
 export class CommandError extends Error {}
 
@@ -64,4 +65,50 @@ export async function canExecuteCommand(userId: string, roomId: string, targetRo
 
 export function generatePassword(): string {
   return nanoid(16)
+}
+
+function chunkBy(value: string, maxLength: number, separator = "\n"): string[] {
+  const lines = value.split(separator)
+  const result = []
+  for (let i = 0; i < lines.length; i += maxLength) {
+    const chunk = lines.slice(i, i + maxLength).join(separator)
+    result.push(chunk)
+  }
+  return result
+}
+
+export async function sendReport(client: MatrixClient, report: CommandReport, roomId: string) {
+  const reportContent = report.failedInvites.concat(report.succeedInvites).join("\n")
+  if (!reportContent) {
+    return ""
+  }
+  const reportContentChunks = chunkBy(reportContent, 100, "\n")
+
+  for (const [i, chunk] of reportContentChunks.entries()) {
+    await client.sendHtmlText(
+      roomId,
+      `Command execution report ${i + 1}/${reportContentChunks.length}<br /><pre>${chunk}</pre>`,
+    )
+  }
+}
+
+export function getErrorMessage(e: any) {
+  if (e instanceof CommandError) {
+    return e.message
+  } else if (typeof e?.body?.error === "string") {
+    return e.body.error as string
+  } else {
+    return `unknown problem`
+  }
+}
+
+export async function validateUserAuthProvider(userId: string): Promise<void> {
+  const account = await adminApi.getUserAccount(userId)
+  if (
+    !account ||
+    !account.external_ids?.length ||
+    !account.external_ids.some((x) => x.auth_provider === config.USER_AUTH_PROVIDER)
+  ) {
+    throw new CommandError(`Wrong authentication provider. Should be "${config.USER_AUTH_PROVIDER}"`)
+  }
 }

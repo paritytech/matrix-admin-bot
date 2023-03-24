@@ -84,6 +84,36 @@ export type RoomMembersResponse = {
   total: number
 }
 
+export type RoomMember = {
+  content: {
+    displayname: string
+    membership: "invite" | "join" | "knock" | "leave" | "ban"
+    [key: string]: any
+  }
+  origin_server_ts: number
+  room_id: string
+  sender: string
+  state_key: string
+  type: string
+  unsigned: {
+    replaces_state: string
+    prev_content: any
+    prev_sender: string
+    age: number
+    [key: string]: any
+  }
+  event_id: string
+  user_id: string
+  age: number
+  replaces_state: string
+  prev_content: {
+    displayname: string
+    membership: "invite" | "join" | "knock" | "leave" | "ban"
+    [key: string]: any
+  }
+  [key: string]: any
+}
+
 export type UserAccountResponse = {
   name: string
   displayname: string | null
@@ -129,4 +159,10 @@ export type UserAccountsResponse = {
   users: UserAccountShort[]
   next_token: string
   total: number
+}
+
+export type CommandReport = {
+  failedInvites: string[]
+  succeedInvites: string[]
+  skippedInvitesNumber: number
 }
