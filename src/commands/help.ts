@@ -57,13 +57,14 @@ ${commandPrefix} ${BULK_INVITE_COMMAND} <roomId>
 
 --------------------------------------------------
 
-${commandPrefix} ${INVITE_ROOM} <roomId>
-    Invite all members from the current room to the room specified by roomId.
+${commandPrefix} ${INVITE_ROOM} <fromRoomId> <targetRoomId>
+    Invite all members from the room specified by <fromRoomId> to the room specified by <targetRoomId>.
     Disabled, banned, and non Google SSO users will be ignored.
-    <roomId>    - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+    <fromRoomId>      - Matrix room id to invite users from !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+    <targetRoomId>    - Matrix room id to invite users to   !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
 
     Examples:
-    - "${commandPrefix} ${INVITE_ROOM} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}"
+    - "${commandPrefix} ${INVITE_ROOM} !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}"
 
 --------------------------------------------------
 
