@@ -16,10 +16,10 @@ common:
     MATRIX_SERVER_URL: "https://matrix.parity-lab.parity.io"
     MATRIX_SERVER_DOMAIN: "matrix.parity-lab.parity.io"
   secrets:
-    ACCESS_TOKEN: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/cicd-parity-stg#ACCESS_TOKEN
-    INVITE_ROOMS_LIST: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/cicd-parity-stg#INVITE_ROOMS_LIST
-    ADMIN_ROOM_ID: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/cicd-parity-stg#ADMIN_ROOM_ID
-    USER_AUTH_PROVIDER: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/cicd-parity-stg#USER_AUTH_PROVIDER
+    ACCESS_TOKEN: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-stg#ACCESS_TOKEN
+    INVITE_ROOMS_LIST: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-stg#INVITE_ROOMS_LIST
+    ADMIN_ROOM_ID: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-stg#ADMIN_ROOM_ID
+    USER_AUTH_PROVIDER: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-stg#USER_AUTH_PROVIDER
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: traefik-internal.parity-stg.parity.io.
