@@ -14,10 +14,10 @@ common:
     APP_HOST: "https://matrix-admin-bot.parity-prod.parity.io"
     DATABASE_NAME: "matrix-admin-bot"
   secrets:
-    ACCESS_TOKEN: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-prod#ACCESS_TOKEN
-    INVITE_ROOMS_LIST: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-prod#INVITE_ROOMS_LIST
-    ADMIN_ROOM_ID: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-prod#ADMIN_ROOM_ID
-    USER_AUTH_PROVIDER: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/devops-parity-prod#USER_AUTH_PROVIDER
+    ACCESS_TOKEN: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/business-automation-parity-prod#ACCESS_TOKEN
+    INVITE_ROOMS_LIST: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/business-automation-parity-prod#INVITE_ROOMS_LIST
+    ADMIN_ROOM_ID: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/business-automation-parity-prod#ADMIN_ROOM_ID
+    USER_AUTH_PROVIDER: ref+vault://kv/gitlab/parity/mirrors/matrix-admin-bot/business-automation-parity-prod#USER_AUTH_PROVIDER
   ingress:
     annotations:
       external-dns.alpha.kubernetes.io/target: traefik-internal.parity-prod.parity.io.
