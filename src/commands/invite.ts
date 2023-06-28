@@ -1,10 +1,9 @@
 import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
-import { groupedRooms } from "src/config/rooms"
-import { CommandError, sendMessage, sleep, canExecuteCommand } from "src/utils"
 import config from "src/config/env"
-
+import { groupedRooms } from "src/config/rooms"
+import { canExecuteCommand, CommandError, sendMessage, sleep } from "src/utils"
 
 const moduleName = "InviteCommand"
 export const defaultGroups = groupedRooms.filter((group) => group.default).map((group) => group.groupName)

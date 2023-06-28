@@ -1,7 +1,7 @@
 import { MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
 import { groupedRooms } from "src/config/rooms"
-import { sendMessage, CommandError, canExecuteCommand } from "src/utils"
+import { canExecuteCommand, CommandError, sendMessage } from "src/utils"
 
 export const LIST_ROOMS_COMMAND = "list-rooms"
 

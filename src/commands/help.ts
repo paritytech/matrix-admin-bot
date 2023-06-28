@@ -11,6 +11,7 @@ import { PROMOTE_COMMAND } from "src/commands/promote"
 import config from "src/config/env"
 import { groupedRooms } from "src/config/rooms"
 import { commandPrefix } from "src/constants"
+
 import { INVITE_ROOM } from "./invite-room"
 
 export async function runHelpCommand(

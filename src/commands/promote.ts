@@ -1,15 +1,10 @@
-import { MatrixClient, MessageEvent, MessageEventContent, MembershipEvent } from "matrix-bot-sdk"
+import { MatrixClient, MembershipEvent, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
-import { CommandError, sendMessage, canExecuteCommand } from "src/utils"
 import config from "src/config/env"
-
+import { canExecuteCommand, CommandError, sendMessage } from "src/utils"
 
 export const PROMOTE_COMMAND = "promote"
-export const POWER_LEVEL_ALIAS: Record<string, number> = {
-  default: 0,
-  moderator: 50,
-  admin: 100
-}
+export const POWER_LEVEL_ALIAS: Record<string, number> = { default: 0, moderator: 50, admin: 100 }
 
 export async function runPromoteCommand(
   roomId: string,
@@ -26,16 +21,16 @@ export async function runPromoteCommand(
       `The provided user handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that username ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
     )
   }
-  // @todo check if it is okay not to have this limitation here
-  // Request by Manon to remove this limitation
-  // if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
-  //   const [, wrongHomeServer] = targetRoomId.split(":")
-  //   throw new CommandError(
-  //     `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
-  //   )
-  // }
+  /* @todo check if it is okay not to have this limitation here
+     Request by Manon to remove this limitation
+     if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+       const [, wrongHomeServer] = targetRoomId.split(":")
+       throw new CommandError(
+         `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
+       )
+     } */
   if (!targetRoomId) {
-    throw new CommandError('Target room id is missing.');
+    throw new CommandError("Target room id is missing.")
   }
   if (!powerLevelArg) {
     throw new CommandError(`Power level argument is missing. It should be a number (0-100).`)
@@ -71,7 +66,7 @@ export async function runPromoteCommand(
   let userMembershipEvent: MembershipEvent | null = null
   let botMembershipEvent: MembershipEvent | null = null
   try {
-    const _roomMemberEvents = (await client.getRoomMembers(targetRoomId)) as unknown as Array<{ event: MembershipEvent }>
+    const _roomMemberEvents = (await client.getRoomMembers(targetRoomId)) as unknown as { event: MembershipEvent }[]
     const roomMemberEvents = _roomMemberEvents.map((x) => x.event)
     userMembershipEvent = roomMemberEvents.find((x) => x.sender === userId) || null
     botMembershipEvent = roomMemberEvents.find((x) => x.sender === botUserId) || null
