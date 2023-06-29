@@ -113,3 +113,11 @@ export async function validateUserAuthProvider(userId: string): Promise<void> {
     throw new CommandError(`Wrong authentication provider. Should be "${config.USER_AUTH_PROVIDER}"`)
   }
 }
+
+export const matrixRoomAliasRegex = new RegExp(
+  `^#([A-Za-z0-9_.-]+):${config.MATRIX_SERVER_DOMAIN.replace(/\./g, ".")}$`,
+)
+
+export const matrixRoomIdRegex = new RegExp(`^!([A-Za-z0-9]+):${config.MATRIX_SERVER_DOMAIN.replace(/\./g, ".")}$`)
+
+export const matrixUserIdRegex = new RegExp(`^@([A-Za-z0-9_.-]+):${config.MATRIX_SERVER_DOMAIN.replace(/\./g, ".")}$`)

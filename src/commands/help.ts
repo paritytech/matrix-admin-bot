@@ -34,17 +34,20 @@ ${commandPrefix} ${LIST_SPACES_COMMAND}
 
 --------------------------------------------------
 
-${commandPrefix} ${INVITE_COMMAND} <userId> [<group>]
+${commandPrefix} ${INVITE_COMMAND} <userId> [<group> | <roomId>]
     Invite user to a group of rooms.
     <userId>    - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN}
     [<group>]   - (Optional) group(s) of rooms to invite user (space separated)
                 Available groups: ${allRoomGroups}
                 Default: ${defaultRoomGroups}
                 To see all rooms & groups - write "${commandPrefix} invite list-rooms"
+    [<roomId>]  - (Optional) Matrix room id or alias
 
     Examples:
     - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN}" - invite user to default ${allRoomGroups}
     - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} common opstooling" - custom groups
+    - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}" - invite user to a particular room
+    - "${commandPrefix} ${INVITE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} #general:${config.MATRIX_SERVER_DOMAIN}" - invite user to a particular room
 
 --------------------------------------------------
 

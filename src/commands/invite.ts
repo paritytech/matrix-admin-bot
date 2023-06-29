@@ -3,7 +3,7 @@ import { MatrixProfileInfo } from "matrix-bot-sdk/lib/models/MatrixProfile"
 
 import config from "src/config/env"
 import { groupedRooms } from "src/config/rooms"
-import { canExecuteCommand, CommandError, sendMessage, sleep } from "src/utils"
+import { canExecuteCommand, CommandError, matrixRoomAliasRegex, matrixRoomIdRegex, sendMessage, sleep } from "src/utils"
 
 const moduleName = "InviteCommand"
 export const defaultGroups = groupedRooms.filter((group) => group.default).map((group) => group.groupName)
@@ -27,8 +27,12 @@ export async function runInviteCommand(
 
   const [, userId, ...userGroups] = args
   const groups: string[] = userGroups?.length ? userGroups : defaultGroups
+  let targetRoom: string | null = null
+  if (userGroups?.length && (matrixRoomIdRegex.test(userGroups[0]) || matrixRoomAliasRegex.test(userGroups[0]))) {
+    targetRoom = userGroups[0]
+  }
   const username: string = await getUserDisplayName(client, userId)
-  const rooms: RoomsList = getRoomsByGroups(groups)
+  const rooms: RoomsList = targetRoom ? [targetRoom] : getRoomsByGroups(groups)
 
   if (!userId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     // userId is something like "@username:identity.server.org"
@@ -38,7 +42,11 @@ export async function runInviteCommand(
     )
   }
 
-  await sendMessage(client, roomId, `Started sending invites of ${username} to ${groups.join(", ")} groups`)
+  await sendMessage(
+    client,
+    roomId,
+    `Started sending invites of ${username} to ${targetRoom ? `${targetRoom} room` : `${groups.join(", ")} groups`}`,
+  )
 
   const report: InviteReport = await inviteUserToRooms(client, rooms, userId)
 
@@ -91,18 +99,29 @@ async function inviteUserToRooms(client: MatrixClient, rooms: RoomsList, userId:
   for (const inviteToRoomId of rooms) {
     let room: { name?: string } = {}
 
+    let roomId = inviteToRoomId
+    if (matrixRoomAliasRegex.test(inviteToRoomId)) {
+      try {
+        roomId = (await client.resolveRoom(inviteToRoomId)) as string
+      } catch (e) {
+        report.failedInvites.push(`Can't find room "${inviteToRoomId}", skipping it.`)
+        continue
+      }
+    }
+
     // check if room exists. Also, we'll use its name
     try {
-      room = (await client.getRoomStateEvent(inviteToRoomId, "m.room.name", null)) as { name: string }
+      room = (await client.getRoomStateEvent(roomId, "m.room.name", null)) as { name: string }
     } catch (e) {
       report.failedInvites.push(`Can't find room "${inviteToRoomId}", skipping it.`)
+      continue
     }
 
     // skip if room wasn't found
     if (room?.name) {
       const roomName = `room: "${room.name}" (${inviteToRoomId})`
       try {
-        await client.inviteUser(userId, inviteToRoomId)
+        await client.inviteUser(userId, roomId)
         report.succeedInviteCount++
         LogService.info(moduleName, `Invited ${userId} to ${roomName}`)
       } catch (e) {
