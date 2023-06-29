@@ -5,7 +5,7 @@ import { adminApi } from "src/admin-api"
 import { CommandReport, RoomInfoResponse } from "src/admin-api/types"
 import config from "src/config/env"
 import { commandPrefix } from "src/constants"
-import { canExecuteCommand, CommandError, sendMessage, TemporaryState } from "src/utils"
+import { canExecuteCommand, CommandError, matrixRoomAliasRegex, sendMessage, TemporaryState } from "src/utils"
 
 const moduleName = "BulkInviteCommand"
 export const BULK_INVITE_COMMAND = "bulk-invite"
@@ -15,6 +15,7 @@ const CONFIRMATION_DELAY_MINUTES = 2
 type State = {
   roomId: string
   roomName: string
+  roomAlias: string | null
 }
 const tempState = new TemporaryState<State>({ ttl: 1e3 * 60 * CONFIRMATION_DELAY_MINUTES })
 
@@ -61,7 +62,10 @@ export async function runBulkInviteCommand(
         await validateUserAuthProvider(user.name)
         await client.inviteUser(user.name, request.roomId)
         report.succeedInvites.push(`✓ Successfully invited ${user.name}`)
-        LogService.info(moduleName, `Invited ${user.name} to room "${request.roomName}" (${request.roomId})`)
+        LogService.info(
+          moduleName,
+          `Invited ${user.name} to room "${request.roomName}" (${request.roomAlias || request.roomId})`,
+        )
       } catch (e) {
         let errorMessage = ""
         if (e instanceof CommandError) {
@@ -112,15 +116,23 @@ export async function runBulkInviteCommand(
   }
 
   // 1. Retrive and validate arguments
-  const [, targetRoomId] = args
+  const [, targetRoomIdOrAlias] = args
   if (!event.sender.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     throw new CommandError(`Access denied.`)
   }
-  if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
-    const [, wrongHomeServer] = targetRoomId.split(":")
+  if (!targetRoomIdOrAlias || !targetRoomIdOrAlias.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+    const [, wrongHomeServer] = targetRoomIdOrAlias.split(":")
     throw new CommandError(
       `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
     )
+  }
+  let targetRoomId = targetRoomIdOrAlias
+  if (matrixRoomAliasRegex.test(targetRoomIdOrAlias)) {
+    try {
+      targetRoomId = (await client.resolveRoom(targetRoomIdOrAlias)) as string
+    } catch (e) {
+      throw new CommandError(`The provided room handle does not represent a room`)
+    }
   }
 
   // 2. Ensure the user can execute the command
@@ -152,7 +164,11 @@ export async function runBulkInviteCommand(
   }
 
   // 5. Prompt the user if they're sure to delete the room
-  tempState.set(event.sender, { roomId: targetRoomId, roomName: room.name })
+  tempState.set(event.sender, {
+    roomId: targetRoomId,
+    roomName: room.name,
+    roomAlias: targetRoomId !== targetRoomIdOrAlias ? targetRoomIdOrAlias : null,
+  })
   const command = `${commandPrefix} ${BULK_INVITE_COMMAND} ${CONFIRMATION_FLAG}`
   const html = `Are you sure you want to invite all members of the current server to the "${
     room.name

@@ -7,6 +7,7 @@ import { commandPrefix } from "src/constants"
 import {
   CommandError,
   getErrorMessage,
+  matrixRoomAliasRegex,
   sendMessage,
   sendReport,
   TemporaryState,
@@ -41,12 +42,26 @@ const getMembersOfTheRoom = async (client: MatrixClient, room_id: string | undef
   return roomMemberEvents
 }
 
-const getRoomDetails = async (roomId: string | undefined): Promise<RoomInfoResponse | null> => {
+const getRoomDetails = async (
+  client: MatrixClient,
+  roomIdOrAlias: string | undefined,
+): Promise<RoomInfoResponse | null> => {
+  if (!roomIdOrAlias) {
+    throw new CommandError(`Unable to retrieve room details.`)
+  }
   let room: RoomInfoResponse | null = null
-  try {
-    if (!roomId) {
-      throw new Error()
+
+  let roomId = roomIdOrAlias
+  if (matrixRoomAliasRegex.test(roomIdOrAlias)) {
+    try {
+      roomId = (await client.resolveRoom(roomIdOrAlias)) as string
+    } catch (e) {
+      LogService.error(moduleName, `Can't resolve room alias`)
+      throw new CommandError(`Unable to retrieve room details.`)
     }
+  }
+
+  try {
     room = await adminApi.getRoomInfo(roomId)
   } catch (e) {
     LogService.error(moduleName, e)
@@ -79,8 +94,8 @@ export async function runInviteRoomCommand(
     tempState.delete(event.sender)
 
     // 2.2 Retrieve room details
-    const targetRoom = await getRoomDetails(request.targetRoomId)
-    const sourceRoom = await getRoomDetails(request.sourceRoomId)
+    const targetRoom = await getRoomDetails(client, request.targetRoomId)
+    const sourceRoom = await getRoomDetails(client, request.sourceRoomId)
     if (!targetRoom || !sourceRoom) {
       throw new CommandError("Could not retrieve information about rooms.")
     }
@@ -143,8 +158,8 @@ export async function runInviteRoomCommand(
   }
 
   // 2. Retrieve room details
-  const targetRoom = await getRoomDetails(targetRoomId)
-  const sourceRoom = await getRoomDetails(sourceRoomId)
+  const targetRoom = await getRoomDetails(client, targetRoomId)
+  const sourceRoom = await getRoomDetails(client, sourceRoomId)
   if (!targetRoom || !sourceRoom) {
     throw new CommandError("Could not retrieve information about rooms.")
   }

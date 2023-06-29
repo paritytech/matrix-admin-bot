@@ -1,7 +1,7 @@
 import { MatrixClient, MembershipEvent, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
 import config from "src/config/env"
-import { canExecuteCommand, CommandError, sendMessage } from "src/utils"
+import { canExecuteCommand, CommandError, matrixRoomAliasRegex, sendMessage } from "src/utils"
 
 export const PROMOTE_COMMAND = "promote"
 export const POWER_LEVEL_ALIAS: Record<string, number> = { default: 0, moderator: 50, admin: 100 }
@@ -14,7 +14,7 @@ export async function runPromoteCommand(
   botUserId: string,
 ): Promise<string> {
   // 1. Retrive and validate arguments
-  const [, userId, targetRoomId, powerLevelArg] = args
+  const [, userId, targetRoomIdOrAlias, powerLevelArg] = args
   if (!userId || !userId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     const [, wrongHomeServer] = userId.split(":")
     throw new CommandError(
@@ -22,20 +22,27 @@ export async function runPromoteCommand(
     )
   }
   /* @todo check if it is okay not to have this limitation here
-     Request by Manon to remove this limitation
-     if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
-       const [, wrongHomeServer] = targetRoomId.split(":")
+     if (!targetRoomIdOrAlias || !targetRoomIdOrAlias.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+       const [, wrongHomeServer] = targetRoomIdOrAlias.split(":")
        throw new CommandError(
          `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
        )
      } */
-  if (!targetRoomId) {
+  if (!targetRoomIdOrAlias) {
     throw new CommandError("Target room id is missing.")
   }
+  let targetRoomId = targetRoomIdOrAlias
+  if (matrixRoomAliasRegex.test(targetRoomIdOrAlias)) {
+    try {
+      targetRoomId = (await client.resolveRoom(targetRoomIdOrAlias)) as string
+    } catch (e) {
+      throw new CommandError(`The provided room handle does not represent a room`)
+    }
+  }
+
   if (!powerLevelArg) {
     throw new CommandError(`Power level argument is missing. It should be a number (0-100).`)
   }
-
   let powerLevel = NaN
   if (POWER_LEVEL_ALIAS[powerLevelArg] !== undefined) {
     powerLevel = POWER_LEVEL_ALIAS[powerLevelArg]
@@ -55,7 +62,7 @@ export async function runPromoteCommand(
   }
 
   // 2. Check if the room exists
-  let room: { name?: string } = {}
+  let room: { name: string }
   try {
     room = (await client.getRoomStateEvent(targetRoomId, "m.room.name", null)) as { name: string }
   } catch (e) {

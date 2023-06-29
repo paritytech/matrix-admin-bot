@@ -5,7 +5,7 @@ import { adminApi } from "src/admin-api"
 import { RoomInfoResponse } from "src/admin-api/types"
 import config from "src/config/env"
 import { commandPrefix } from "src/constants"
-import { canExecuteCommand, CommandError, sendMessage, TemporaryState } from "src/utils"
+import { canExecuteCommand, CommandError, matrixRoomAliasRegex, sendMessage, TemporaryState } from "src/utils"
 
 const moduleName = "DeleteRoomCommand"
 export const DELETE_ROOM_COMMAND = "delete-room"
@@ -52,15 +52,23 @@ export async function runDeleteRoomCommand(
   }
 
   // 1. Retrive and validate arguments
-  const [, targetRoomId] = args
+  const [, targetRoomIdOrAlias] = args
   if (!event.sender.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     throw new CommandError(`Access denied.`)
   }
-  if (!targetRoomId || !targetRoomId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
-    const [, wrongHomeServer] = targetRoomId.split(":")
+  if (!targetRoomIdOrAlias || !targetRoomIdOrAlias.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+    const [, wrongHomeServer] = targetRoomIdOrAlias.split(":")
     throw new CommandError(
       `The provided room handle is not registered under ${config.MATRIX_SERVER_DOMAIN}, but ${wrongHomeServer}. \nMake sure that the room handle ends with ":${config.MATRIX_SERVER_DOMAIN}"`,
     )
+  }
+  let targetRoomId = targetRoomIdOrAlias
+  if (matrixRoomAliasRegex.test(targetRoomIdOrAlias)) {
+    try {
+      targetRoomId = (await client.resolveRoom(targetRoomIdOrAlias)) as string
+    } catch (e) {
+      throw new CommandError(`The provided room handle does not represent a room`)
+    }
   }
 
   // 2. Ensure the user can execute the command

@@ -54,28 +54,30 @@ ${commandPrefix} ${INVITE_COMMAND} <userId> [<group> | <roomId>]
 ${commandPrefix} ${BULK_INVITE_COMMAND} <roomId>
     Invite all members of the current server to a given room.
     Disabled, banned, and non Google SSO users will be ignored.
-    <roomId>    - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+    <roomId>    - Matrix room id or alias
 
     Examples:
     - "${commandPrefix} ${BULK_INVITE_COMMAND} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}"
+    - "${commandPrefix} ${BULK_INVITE_COMMAND} #general:${config.MATRIX_SERVER_DOMAIN}"
 
 --------------------------------------------------
 
 ${commandPrefix} ${INVITE_ROOM} <fromRoomId> <targetRoomId>
     Invite all members from the room specified by <fromRoomId> to the room specified by <targetRoomId>.
     Disabled, banned, and non Google SSO users will be ignored.
-    <fromRoomId>      - Matrix room id to invite users from !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
-    <targetRoomId>    - Matrix room id to invite users to   !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}
+    <fromRoomId>      - Matrix room id or alias to invite users from
+    <targetRoomId>    - Matrix room id or alias to invite users to
 
     Examples:
-    - "${commandPrefix} ${INVITE_ROOM} !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN}"
+    - "${commandPrefix} ${INVITE_ROOM} !abcd1:${config.MATRIX_SERVER_DOMAIN} !efgh2:${config.MATRIX_SERVER_DOMAIN}"
+    - "${commandPrefix} ${INVITE_ROOM} #room1:${config.MATRIX_SERVER_DOMAIN} #room2:${config.MATRIX_SERVER_DOMAIN}"
 
 --------------------------------------------------
 
 ${commandPrefix} ${PROMOTE_COMMAND} <userId> <roomId> <powerLevel>
     Assign a specific power level to the user in the room.
     <userId>     - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN}
-    <roomId>     - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} or #roomAlias:${config.MATRIX_SERVER_DOMAIN}
+    <roomId>     - Matrix room id or alias
     <powerLewel> - Ddesired power level for the user as a number or alias:
                    - Number (0-100)
                    - Aliases:
@@ -85,16 +87,17 @@ ${commandPrefix} ${PROMOTE_COMMAND} <userId> <roomId> <powerLevel>
 
     Examples:
     - "${commandPrefix} ${PROMOTE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN} 99" - promote the user to level 99
-    - "${commandPrefix} ${PROMOTE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} #pupps:${config.MATRIX_SERVER_DOMAIN} moderator" - promote the user to moderator level (50)
+    - "${commandPrefix} ${PROMOTE_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} #roomAlias:${config.MATRIX_SERVER_DOMAIN} moderator" - promote the user to moderator level (50)
 
 --------------------------------------------------
 
 ${commandPrefix} ${DELETE_ROOM_COMMAND} <roomId>
     Kick all room members and completely delete the room.
-    <roomId>     - Matrix room id !RaNdOmRoOmId:${config.MATRIX_SERVER_DOMAIN} or #roomAlias:${config.MATRIX_SERVER_DOMAIN}
+    <roomId>     - Matrix room id or alias
 
     Example:
     - "${commandPrefix} ${DELETE_ROOM_COMMAND} !MzyrIlxGUHXYwtRGrO:${config.MATRIX_SERVER_DOMAIN}" - delete the room
+    - "${commandPrefix} ${DELETE_ROOM_COMMAND} #roomAlias:${config.MATRIX_SERVER_DOMAIN}" - delete the room
 
 --------------------------------------------------
 
