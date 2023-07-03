@@ -9,6 +9,7 @@ import {
   RoomInfoShort,
   RoomMembersResponse,
   RoomPowerLevelsEvent,
+  RoomStateResponse,
   UserAccountResponse,
   UserAccountShort,
   UserAccountsResponse,
@@ -50,12 +51,14 @@ class AdminApi {
     })) as RoomDeletionResponse
   }
 
+  async getRoomState(roomId: string): Promise<RoomStateResponse> {
+    return (await this.makeRequest("GET", `/v1/rooms/${roomId}/state`)) as RoomStateResponse
+  }
+
   async getRoomPowerLevelsEvent(roomId: string): Promise<RoomPowerLevelsEvent | null> {
     try {
-      const data = (await this.makeRequest("GET", `/v1/rooms/${roomId}/state`)) as {
-        state: RoomPowerLevelsEvent[]
-      }
-      const powerLevelEvent = data.state.find((x) => x.type === "m.room.power_levels")
+      const data = await this.getRoomState(roomId)
+      const powerLevelEvent = data.state.find((x) => x.type === "m.room.power_levels") as unknown as RoomPowerLevelsEvent
       if (!powerLevelEvent) {
         return null
       }

@@ -12,3 +12,6 @@ build
 
 # dotenv environment variables file
 .env
+
+# system
+.DS_Store

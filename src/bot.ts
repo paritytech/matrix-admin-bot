@@ -3,6 +3,7 @@ import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } fro
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
 import { LIST_SPACES_COMMAND, runListSpacesCommand } from "src/commands/list-spaces"
 import { commandPrefix } from "src/constants"
+import config from "src/config/env"
 
 import { BULK_INVITE_COMMAND, runBulkInviteCommand } from "./commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND, runDeactivateUserCommand } from "./commands/deactivate-user"
@@ -11,6 +12,7 @@ import { runHelpCommand } from "./commands/help"
 import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { INVITE_ROOM, runInviteRoomCommand } from "./commands/invite-room"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
+import { runSpaceCommand, SPACE_COMMAND } from "./commands/space"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -63,6 +65,7 @@ export default class Bot {
     if (event.isRedacted) return // Ignore redacted events that come through
     if (event.sender === this.userId) return // Ignore ourselves
     if (event.messageType !== "m.text") return // Ignore non-text messages
+    if (config.ADMIN_ROOM_ID !== roomId) return // Ignore messages outside of the admin room
 
     /* Ensure that the event is a command before going on. We allow people to ping
            the bot as well as using our COMMAND_PREFIX. */
@@ -108,6 +111,8 @@ export default class Bot {
           return await runDeleteRoomCommand(roomId, event, args, this.client)
         case DEACTIVATE_USER_COMMAND:
           return await runDeactivateUserCommand(roomId, event, args, this.client)
+        case SPACE_COMMAND:
+          return await runSpaceCommand(roomId, event, args, this.client)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }

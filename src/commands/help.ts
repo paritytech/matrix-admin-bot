@@ -8,6 +8,7 @@ import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
 import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
 import { LIST_SPACES_COMMAND } from "src/commands/list-spaces"
 import { PROMOTE_COMMAND } from "src/commands/promote"
+import { SPACE_COMMAND } from "src/commands/space"
 import config from "src/config/env"
 import { groupedRooms } from "src/config/rooms"
 import { commandPrefix } from "src/constants"
@@ -31,6 +32,18 @@ ${commandPrefix} ${LIST_ROOMS_COMMAND} [<group>]
 
 ${commandPrefix} ${LIST_SPACES_COMMAND}
     Show the list of all rooms and spaces on the current server in CSV format
+
+--------------------------------------------------
+
+${commandPrefix} ${SPACE_COMMAND} <spaceId> [list | add | remove] [<roomId>]
+    A command for managing spacess. See examples below.
+    <spaceId>    - Matrix room id or alias for the space
+    <roomId>     - Matrix room id or alias
+
+    Examples:
+    - "${commandPrefix} ${SPACE_COMMAND} !abcd:${config.MATRIX_SERVER_DOMAIN} list" – List all rooms in the "!abcd:..." space
+    - "${commandPrefix} ${SPACE_COMMAND} !abcd:${config.MATRIX_SERVER_DOMAIN} add !efgh:${config.MATRIX_SERVER_DOMAIN}" – Add the "!efgh:..." room to the "!abcd:..." space
+    - "${commandPrefix} ${SPACE_COMMAND} !abcd:${config.MATRIX_SERVER_DOMAIN} remove !efgh:${config.MATRIX_SERVER_DOMAIN}" – Remove the "!efgh:..." room from the "!abcd:..." space
 
 --------------------------------------------------
 

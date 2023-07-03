@@ -121,3 +121,16 @@ export const matrixRoomAliasRegex = new RegExp(
 export const matrixRoomIdRegex = new RegExp(`^!([A-Za-z0-9]+):${config.MATRIX_SERVER_DOMAIN.replace(/\./g, ".")}$`)
 
 export const matrixUserIdRegex = new RegExp(`^@([A-Za-z0-9_.-]+):${config.MATRIX_SERVER_DOMAIN.replace(/\./g, ".")}$`)
+
+export async function resolveRoomAlias(client: MatrixClient, roomIdOrAlias: string): Promise<string | null> {
+  let roomId = roomIdOrAlias
+  if (matrixRoomAliasRegex.test(roomIdOrAlias)) {
+    try {
+      roomId = (await client.resolveRoom(roomIdOrAlias)) as string
+    } catch (e) {
+      return null
+      // throw new CommandError(`The provided room handle does not represent a room`)
+    }
+  }
+  return roomId
+}

@@ -53,6 +53,25 @@ export type RoomDeletionResponse = {
   new_room_id: string | null
 }
 
+export type RoomStateEvent = {
+  content: Record<string, any>
+  origin_server_ts: number
+  room_id: string
+  sender: string
+  state_key: string
+  type: string
+  unsigned: Record<string, any>
+  event_id: string
+  user_id: string
+  age: number
+  replaces_state: string
+  prev_content: Record<string, any>
+}
+
+export type RoomStateResponse = {
+  state: RoomStateEvent[]
+}
+
 export type RoomPowerLevelsEvent = {
   content: {
     ban: number
