@@ -17,7 +17,7 @@
 # - The latest matching rule, if multiple, takes precedence.
 
 # Global code owners
-* @paritytech/business-automation @mordamax
+* @paritytech/business-automation
 
 # CI
 /.gitlab-ci.yml @paritytech/ci @paritytech/business-automation
