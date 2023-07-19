@@ -24,7 +24,7 @@ common:
       port: 80
       targetPort: 8000
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-dns01
       kubernetes.io/ingress.class: traefik-internal
