@@ -9,7 +9,7 @@ gcloud-sqlproxy:
 common:
   fullnameOverride: "matrix-admin-bot"
   extraLabels:
-    team: "opstooling"
+    team: "bizautomation"
   serviceAccount:
     create: false
   image:
