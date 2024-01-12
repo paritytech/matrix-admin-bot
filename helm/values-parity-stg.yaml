@@ -10,6 +10,7 @@
 #       port: 5432
 
 common:
+  replicaCount: 0
   env:
     APP_HOST: "https://matrix-admin-bot.parity-stg.parity.io"
     DATABASE_NAME: "matrix-admin-bot"
