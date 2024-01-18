@@ -185,3 +185,7 @@ export type CommandReport = {
   succeedInvites: string[]
   skippedInvitesNumber: number
 }
+
+export type LoginUserResponse = {
+  access_token: string
+}

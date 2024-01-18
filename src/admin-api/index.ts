@@ -4,6 +4,7 @@ import config from "src/config/env"
 
 import {
   ListRoomResponse,
+  LoginUserResponse,
   RoomDeletionResponse,
   RoomInfoResponse,
   RoomInfoShort,
@@ -58,7 +59,9 @@ class AdminApi {
   async getRoomPowerLevelsEvent(roomId: string): Promise<RoomPowerLevelsEvent | null> {
     try {
       const data = await this.getRoomState(roomId)
-      const powerLevelEvent = data.state.find((x) => x.type === "m.room.power_levels") as unknown as RoomPowerLevelsEvent
+      const powerLevelEvent = data.state.find(
+        (x) => x.type === "m.room.power_levels",
+      ) as unknown as RoomPowerLevelsEvent
       if (!powerLevelEvent) {
         return null
       }
@@ -135,6 +138,17 @@ class AdminApi {
       total = result.total_rooms
     } while (loop * limit <= total)
     return rooms
+  }
+
+  async loginUser(userId: string): Promise<LoginUserResponse | null> {
+    try {
+      return (await this.makeRequest("GET", `/v1/users/${userId}/login`)) as LoginUserResponse
+    } catch (err) {
+      if (err.response.status === 404) {
+        return null
+      }
+      throw err
+    }
   }
 }
 
