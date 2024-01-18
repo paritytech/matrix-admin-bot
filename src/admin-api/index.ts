@@ -140,13 +140,11 @@ class AdminApi {
     return rooms
   }
 
-  async loginUser(userId: string): Promise<LoginUserResponse | null> {
+  async loginUser(userId: string, validUnitlMs?: number): Promise<LoginUserResponse | null> {
     try {
-      return (await this.makeRequest("GET", `/v1/users/${userId}/login`)) as LoginUserResponse
+      const payload = validUnitlMs ? { valid_until_ms: validUnitlMs } : undefined
+      return (await this.makeRequest("POST", `/v1/users/${userId}/login`, payload)) as LoginUserResponse
     } catch (err) {
-      if (err.response.status === 404) {
-        return null
-      }
       throw err
     }
   }
