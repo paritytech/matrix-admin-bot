@@ -6,9 +6,14 @@ import config from "src/config/env"
 import { canExecuteCommand, CommandError } from "src/utils"
 
 const moduleName = "RotateTokenCommand"
-export const ROTATE_TOKEN_COMMAND = "rotate-token"
+export const ACCOUNT_COMMAND = "account"
 
-export async function runRotateTokenCommand(
+enum Command {
+  LoginUser = "login",
+  CreateDevice = "create-device",
+}
+
+export async function runAccountCommand(
   roomId: string,
   event: MessageEvent<MessageEventContent>,
   args: string[],
@@ -21,9 +26,12 @@ export async function runRotateTokenCommand(
   }
 
   // 1. Retrive and validate arguments
-  const [, targetUserId] = args
+  const [, command, targetUserId, ...extraArgs] = args
   if (!event.sender.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     throw new CommandError(`Access denied.`)
+  }
+  if (!Object.values(Command).includes(command as Command)) {
+    throw new CommandError(`Invalid subcommand. Should be one of: ${Object.values(Command).join(", ")}`)
   }
   if (!targetUserId || !targetUserId.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
     const [, wrongHomeServer] = targetUserId.split(":")
@@ -44,15 +52,35 @@ export async function runRotateTokenCommand(
     throw new CommandError(`The user "${targetUserId}" cannot be found.`)
   }
 
-  // 3. Generate an access token
-  try {
-    const response = await adminApi.loginUser(targetUserId)
-    await client.sendHtmlText(
-      roomId,
-      `New access token for user "${targetUserId}": <code>${JSON.stringify(response)}</code>`,
-    )
-  } catch (err) {
-    LogService.error(moduleName, err)
-    throw new CommandError(`Unable to retrieve user access token.`)
+  // 3.1 Generate an access token
+  if (command === Command.LoginUser) {
+    try {
+      const response = await adminApi.loginUser(targetUserId)
+      await client.sendHtmlText(
+        roomId,
+        `New access token for user "${targetUserId}": <code>${JSON.stringify(response)}</code>`,
+      )
+    } catch (err) {
+      LogService.error(moduleName, err)
+      throw new CommandError(`Unable to retrieve user access token.`)
+    }
+  }
+
+  // 3.2 Create a new device
+  if (command === Command.CreateDevice) {
+    const deviceId = extraArgs[0]
+    if (!deviceId) {
+      throw new CommandError(`Missing device ID argument.`)
+    }
+    try {
+      const response = await adminApi.createDevice(targetUserId, deviceId)
+      await client.sendHtmlText(
+        roomId,
+        `Created a new device for user "${targetUserId}": <code>${JSON.stringify(response)}</code>`,
+      )
+    } catch (err) {
+      LogService.error(moduleName, err)
+      throw new CommandError(`Unable to retrieve user access token.`)
+    }
   }
 }

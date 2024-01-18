@@ -148,6 +148,14 @@ class AdminApi {
       throw err
     }
   }
+
+  async createDevice(userId: string, deviceId: string): Promise<unknown> {
+    try {
+      return await this.makeRequest("POST", `/v2/users/${userId}/devices`, { device_id: deviceId })
+    } catch (err) {
+      throw err
+    }
+  }
 }
 
 export const adminApi = new AdminApi({ host: config.MATRIX_SERVER_URL, accessToken: config.ACCESS_TOKEN })

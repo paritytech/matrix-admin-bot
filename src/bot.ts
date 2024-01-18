@@ -13,7 +13,7 @@ import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { INVITE_ROOM, runInviteRoomCommand } from "./commands/invite-room"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
 import { runSpaceCommand, SPACE_COMMAND } from "./commands/space"
-import { runRotateTokenCommand, ROTATE_TOKEN_COMMAND } from "./commands/rotate-token"
+import { runAccountCommand, ACCOUNT_COMMAND } from "./commands/account"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -114,8 +114,8 @@ export default class Bot {
           return await runDeactivateUserCommand(roomId, event, args, this.client)
         case SPACE_COMMAND:
           return await runSpaceCommand(roomId, event, args, this.client)
-        case ROTATE_TOKEN_COMMAND:
-          return await runRotateTokenCommand(roomId, event, args, this.client)
+        case ACCOUNT_COMMAND:
+          return await runAccountCommand(roomId, event, args, this.client)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }
