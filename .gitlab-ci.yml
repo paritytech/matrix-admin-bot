@@ -137,8 +137,8 @@ push-docker-image-description:
 #### stage:                        deploy
 
 .deploy:                           &deploy-k8s
-  image: quay.io/argoproj/argocd:v2.7.9
   variables:
+    CI_IMAGE: quay.io/argoproj/argocd:v2.7.9
     ARGOCD_OPTS: --grpc-web --grpc-web-root-path /$ENVIRONMENT
     APP: matrix-admin-bot
   environment:
