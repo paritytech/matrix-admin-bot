@@ -9,6 +9,7 @@ export interface Environment {
   NODE_ENV: string
   MATRIX_SERVER_URL: string
   MATRIX_SERVER_DOMAIN: string
+  MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL: string
   ACCESS_TOKEN: string
   ADMIN_ROOM_ID: string
   DATA_PATH: string
@@ -48,6 +49,7 @@ const environmentSchema = Joi.object<Environment>({
   ADMIN_ROOM_ID: Joi.string().required(),
   DATA_PATH: Joi.string().default("storage"),
   MATRIX_SERVER_URL: Joi.string().default("https://m.parity.io"),
+  MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL: Joi.string().required(),
   MATRIX_SERVER_DOMAIN: Joi.string().default("parity.io"),
   INVITE_ROOMS_LIST: JoiJSON.array()
     .items(
