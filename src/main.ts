@@ -3,6 +3,7 @@ import {
   LogService,
   MatrixClient,
   RichConsoleLogger,
+  RustSdkCryptoStorageProvider,
   SimpleFsStorageProvider,
 } from "matrix-bot-sdk"
 import * as path from "path"
@@ -24,9 +25,17 @@ LogService.info(moduleName, "Bot starting...")
 void (async () => {
   // Prepare the storage system for the bot
   const storage = new SimpleFsStorageProvider(path.join(config.DATA_PATH, "bot.json"))
+  const cryptoStorage = new RustSdkCryptoStorageProvider(path.join(config.DATA_PATH, "crypto"), 0)
 
   // Now create the client
-  const client = new MatrixClient(config.MATRIX_SERVER_URL, config.ACCESS_TOKEN, storage)
+  const client = new MatrixClient(config.MATRIX_SERVER_URL, config.ACCESS_TOKEN, storage, cryptoStorage)
+
+  // Enable E2EE
+  const joinedRooms = await client.getJoinedRooms()
+  await client.crypto.prepare(joinedRooms)
+  client.on("room.failed_decryption", async (roomId: string, event: any, e: Error) => {
+    LogService.error("index", `Failed to decrypt ${roomId} ${event.event_id} because `, e)
+  })
 
   // Setup the autojoin mixin (if enabled)
   AutojoinRoomsMixin.setupOnClient(client)

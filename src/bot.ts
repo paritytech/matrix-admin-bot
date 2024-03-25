@@ -2,9 +2,10 @@ import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } fro
 
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
 import { LIST_SPACES_COMMAND, runListSpacesCommand } from "src/commands/list-spaces"
-import { commandPrefix } from "src/constants"
 import config from "src/config/env"
+import { commandPrefix } from "src/constants"
 
+import { ACCOUNT_COMMAND, runAccountCommand } from "./commands/account"
 import { BULK_INVITE_COMMAND, runBulkInviteCommand } from "./commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND, runDeactivateUserCommand } from "./commands/deactivate-user"
 import { DELETE_ROOM_COMMAND, runDeleteRoomCommand } from "./commands/delete-room"
@@ -13,7 +14,6 @@ import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { INVITE_ROOM, runInviteRoomCommand } from "./commands/invite-room"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
 import { runSpaceCommand, SPACE_COMMAND } from "./commands/space"
-import { runAccountCommand, ACCOUNT_COMMAND } from "./commands/account"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -66,6 +66,7 @@ export default class Bot {
     if (event.isRedacted) return // Ignore redacted events that come through
     if (event.sender === this.userId) return // Ignore ourselves
     if (event.messageType !== "m.text") return // Ignore non-text messages
+    if (!event.sender.endsWith(`:${config.MATRIX_SERVER_DOMAIN}`)) return // Ignore messages from other servers
     if (config.ADMIN_ROOM_ID !== roomId) return // Ignore messages outside of the admin room
 
     /* Ensure that the event is a command before going on. We allow people to ping

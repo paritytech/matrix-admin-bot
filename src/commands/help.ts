@@ -1,6 +1,7 @@
 import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
+import { ACCOUNT_COMMAND, Command as AccountSubcommand } from "src/commands/account"
 import { BULK_INVITE_COMMAND } from "src/commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
@@ -124,6 +125,33 @@ ${commandPrefix} ${DEACTIVATE_USER_COMMAND} <userId> [recover]
     Examples:
     - "${commandPrefix} ${DEACTIVATE_USER_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN}" - deactivate the user
     - "${commandPrefix} ${DEACTIVATE_USER_COMMAND} @username:${config.MATRIX_SERVER_DOMAIN} recover" - activate user with password reset
+
+--------------------------------------------------
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.List}
+    Lists all bot accounts on the server.
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.Create} <userId> [permanent]
+    Creates a bot account and a new OAuth2 session. By default an access and refresh tokens will be sent to a requester in the E2EE DM chat.
+
+    <userId>     - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN} or just username
+    [permanent]    - (Optional) flag making the access token permanent
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.SignIn} <userId> [permanent]
+    Does the same as the create command, but for an existing account
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.ListSessions} <userId>
+    List all active OAuth2 sessions in the format: ID, CreatedAt, LastActiveAt.
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.SignOut} <userId> <sessionId | all>
+    List all active OAuth2 sessions in the format: ID, CreatedAt, LastActiveAt.
+
+    <sessionId>  - ID of the session to sign out. Use "all" to deactivate all active sessions.
+
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.AcceptInvitation} <userId> <roomId> [standard-auth]
+    Accept an invitation to a room on behalf of the bot. The bot must be invited to the room first.
+    When the "standard-auth" flag is set, the bot will use the standard authentication flow. Otherwise,
+    the bot will utilize Matrix Authentication Service.
 
 --------------------------------------------------
 
