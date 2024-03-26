@@ -1,4 +1,4 @@
-FROM docker.io/library/node:16.10-alpine
+FROM node:18-alpine
 
 # metadata
 ARG VCS_REF=master

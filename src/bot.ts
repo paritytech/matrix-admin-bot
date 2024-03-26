@@ -66,6 +66,7 @@ export default class Bot {
     if (event.isRedacted) return // Ignore redacted events that come through
     if (event.sender === this.userId) return // Ignore ourselves
     if (event.messageType !== "m.text") return // Ignore non-text messages
+    if (!event.sender.endsWith(`:${config.MATRIX_SERVER_DOMAIN}`)) return // Ignore messages from other servers
     if (config.ADMIN_ROOM_ID !== roomId) return // Ignore messages outside of the admin room
 
     /* Ensure that the event is a command before going on. We allow people to ping

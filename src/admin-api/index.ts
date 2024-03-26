@@ -89,6 +89,10 @@ class AdminApi {
     await this.makeRequest("PUT", `/v2/users/${userId}`, { deactivated: false, password })
   }
 
+  async markUserAsBot(userId: string): Promise<void> {
+    await this.makeRequest("PUT", `/v2/users/${userId}`, { user_type: "bot" })
+  }
+
   async deactivateUser(userId: string): Promise<void> {
     await this.makeRequest("PUT", `/v2/users/${userId}`, { deactivated: true })
   }
@@ -147,6 +151,15 @@ class AdminApi {
     } catch (err) {
       throw err
     }
+  }
+
+  async logoutUser(accessToken: string): Promise<void> {
+    return await axios({
+      url: `${this.host}/_matrix/client/v3/logout`,
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+      data: {},
+    }).then((res) => res.data)
   }
 
   async createDevice(userId: string, deviceId: string): Promise<unknown> {
