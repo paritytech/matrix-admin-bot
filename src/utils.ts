@@ -1,4 +1,4 @@
-import { MatrixClient } from "matrix-bot-sdk"
+import { MatrixClient, LogService, EncryptionAlgorithm } from "matrix-bot-sdk"
 import { nanoid } from "nanoid"
 
 import { adminApi } from "src/admin-api"
@@ -133,4 +133,53 @@ export async function resolveRoomAlias(client: MatrixClient, roomIdOrAlias: stri
     }
   }
   return roomId
+}
+
+export async function ensureEncryptedDmRoom(client: MatrixClient, userId: string): Promise<string | null> {
+  const existingRoomId = await client.dms.getOrCreateDm(userId, async () => null as unknown as string)
+  if (existingRoomId) {
+    const event = await client.getRoomStateEvent(existingRoomId, "m.room.member", userId)
+    if (event?.membership === "join") {
+      return existingRoomId
+    }
+    return null
+  } else {
+    await client.dms.getOrCreateDm(userId, async () => {
+      const roomId = await client.createRoom({
+        invite: [userId],
+        is_direct: true,
+        visibility: "private",
+        initial_state: [
+          { type: "m.room.encryption", state_key: "", content: { algorithm: EncryptionAlgorithm.MegolmV1AesSha2 } },
+        ],
+      })
+      LogService.info("utils", `Created a new encrypted DM room ${roomId} for user ${userId}`)
+      return roomId
+    })
+    return null
+  }
+}
+
+export async function ensureDmRoom(client: MatrixClient, userId: string): Promise<string> {
+  return await client.dms.getOrCreateDm(userId, async () => {
+    const roomId = await client.createRoom({ invite: [userId], is_direct: true, visibility: "private" })
+    console.log("Created a new DM room NON-e2ee", roomId)
+    LogService.info("utils", `Created a new DM room ${roomId} for user ${userId}`)
+    return roomId
+  })
+}
+
+export function usernameToLocalpart(username: string): string {
+  return username.replace(/^@/, "").replace(new RegExp(`:${config.MATRIX_SERVER_DOMAIN}$`), "")
+}
+
+export function localpartToUserId(localpart: string): string {
+  let result = localpart
+  if (!result.startsWith("@")) {
+    result = `@${result}`
+  }
+  if (!result.endsWith(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+    result += `:${config.MATRIX_SERVER_DOMAIN}`
+  }
+  return result
 }

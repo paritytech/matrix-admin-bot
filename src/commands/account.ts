@@ -1,9 +1,9 @@
 import axios from "axios"
-import { EncryptionAlgorithm, LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
+import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
 import { adminApi } from "src/admin-api"
 import config from "src/config/env"
-import { CommandError } from "src/utils"
+import { CommandError, ensureEncryptedDmRoom, usernameToLocalpart, localpartToUserId } from "src/utils"
 
 const moduleName = "AccountCommand"
 export const ACCOUNT_COMMAND = "account"
@@ -61,8 +61,8 @@ export async function runAccountCommand(
   if (!targetUsername) {
     throw new CommandError(`Missing username argument.`)
   }
-  const username = sanitizeUsername(targetUsername)
-  const userId = usernameToUserId(username)
+  const userLocalpart = usernameToLocalpart(targetUsername)
+  const userId = localpartToUserId(userLocalpart)
 
   // Create a new account
   if (command === Command.Create || command === Command.SignIn) {
@@ -73,7 +73,7 @@ export async function runAccountCommand(
       throw new CommandError(`User ${userId} doesn't exist.`)
     }
 
-    const dmRoomId = await ensureDmRoom(client, event.sender)
+    const dmRoomId = await ensureEncryptedDmRoom(client, event.sender)
     if (!dmRoomId) {
       await client.sendHtmlText(
         roomId,
@@ -83,7 +83,7 @@ export async function runAccountCommand(
     }
 
     const permanent = extraArgs[0] === "permanent"
-    const userDetails = await getOrCreateUser(username)
+    const userDetails = await getOrCreateUser(userLocalpart)
 
     if (command === Command.Create) {
       await adminApi.markUserAsBot(userId)
@@ -111,7 +111,7 @@ export async function runAccountCommand(
     if (!user) {
       throw new CommandError(`User ${userId} doesn't exist.`)
     }
-    const userDetails = await getOrCreateUser(username)
+    const userDetails = await getOrCreateUser(userLocalpart)
     const sessions = await getOauth2Sessions(userDetails.id).then((xs) => xs.filter((x) => x.state === "ACTIVE"))
     if (!sessions.length) {
       await client.sendHtmlText(roomId, `No active sessions for the account ${userId}.`)
@@ -133,7 +133,7 @@ export async function runAccountCommand(
     if (!user) {
       throw new CommandError(`User ${userId} doesn't exist.`)
     }
-    const userDetails = await getOrCreateUser(username)
+    const userDetails = await getOrCreateUser(userLocalpart)
     const sessions = await getOauth2Sessions(userDetails.id).then((xs) => xs.filter((x) => x.state === "ACTIVE"))
 
     if (!sessions.length) {
@@ -187,7 +187,7 @@ export async function runAccountCommand(
         accessToken = loginResponse.access_token
       }
     } else {
-      const userDetails = await getOrCreateUser(username)
+      const userDetails = await getOrCreateUser(userLocalpart)
       const session = await createOauth2Session(userDetails.id, true)
       sessionId = session.sessionId
       accessToken = session.accessToken
@@ -217,46 +217,6 @@ export async function runAccountCommand(
       }
     }
   }
-}
-
-async function ensureDmRoom(client: MatrixClient, userId: string): Promise<string | null> {
-  const existingRoomId = await client.dms.getOrCreateDm(userId, async () => null as unknown as string)
-  if (existingRoomId) {
-    const event = await client.getRoomStateEvent(existingRoomId, "m.room.member", userId)
-    if (event?.membership === "join") {
-      return existingRoomId
-    }
-    return null
-  } else {
-    await client.dms.getOrCreateDm(userId, async () => {
-      const roomId = await client.createRoom({
-        invite: [userId],
-        is_direct: true,
-        visibility: "private",
-        initial_state: [
-          { type: "m.room.encryption", state_key: "", content: { algorithm: EncryptionAlgorithm.MegolmV1AesSha2 } },
-        ],
-      })
-      LogService.info(moduleName, `Created a new DM room ${roomId} for user ${userId}`)
-      return roomId
-    })
-    return null
-  }
-}
-
-function sanitizeUsername(username: string): string {
-  return username.replace(/^@/, "").replace(new RegExp(`:${config.MATRIX_SERVER_DOMAIN}$`), "")
-}
-
-function usernameToUserId(username: string): string {
-  let result = username
-  if (!result.startsWith("@")) {
-    result = `@${result}`
-  }
-  if (!result.endsWith(`:${config.MATRIX_SERVER_DOMAIN}`)) {
-    result += `:${config.MATRIX_SERVER_DOMAIN}`
-  }
-  return result
 }
 
 async function getOrCreateUser(username: string): Promise<{ id: string; username: string }> {
