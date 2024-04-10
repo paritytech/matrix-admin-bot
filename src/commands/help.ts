@@ -2,6 +2,7 @@ import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
 import { ACCOUNT_COMMAND, Command as AccountSubcommand } from "src/commands/account"
+import { WELCOME_MESSAGE_COMMAND, Command as WelcomeMessageSubcommand } from "src/commands/welcome-message"
 import { BULK_INVITE_COMMAND } from "src/commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
@@ -152,6 +153,14 @@ ${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.AcceptInvitation} <userI
     Accept an invitation to a room on behalf of the bot. The bot must be invited to the room first.
     When the "standard-auth" flag is set, the bot will use the standard authentication flow. Otherwise,
     the bot will utilize Matrix Authentication Service.
+
+--------------------------------------------------
+
+${commandPrefix} ${WELCOME_MESSAGE_COMMAND} ${WelcomeMessageSubcommand.Show}
+    Show the welcome message the bot can send to a user
+
+${commandPrefix} ${WELCOME_MESSAGE_COMMAND} ${WelcomeMessageSubcommand.Send} <userId>
+    Send the welcome message to a user in DM
 
 --------------------------------------------------
 

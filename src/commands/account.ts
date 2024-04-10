@@ -43,6 +43,10 @@ export async function runAccountCommand(
     throw new CommandError(`Invalid subcommand. Should be one of: ${Object.values(Command).join(", ")}`)
   }
 
+  if (!config.MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL) {
+    throw new CommandError("MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL is not configured")
+  }
+
   // List bot accounts
   if (command === Command.List) {
     const users = await adminApi.getUserAccounts()

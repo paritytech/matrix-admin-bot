@@ -14,6 +14,7 @@ import { INVITE_COMMAND, runInviteCommand } from "./commands/invite"
 import { INVITE_ROOM, runInviteRoomCommand } from "./commands/invite-room"
 import { PROMOTE_COMMAND, runPromoteCommand } from "./commands/promote"
 import { runSpaceCommand, SPACE_COMMAND } from "./commands/space"
+import { runWelcomeMessageCommand, WELCOME_MESSAGE_COMMAND } from "./commands/welcome-message"
 import { CommandError } from "./utils"
 
 /* This is the maximum allowed time between time on matrix server
@@ -117,6 +118,8 @@ export default class Bot {
           return await runSpaceCommand(roomId, event, args, this.client)
         case ACCOUNT_COMMAND:
           return await runAccountCommand(roomId, event, args, this.client)
+        case WELCOME_MESSAGE_COMMAND:
+          return await runWelcomeMessageCommand(roomId, event, args, this.client)
         default:
           return await runHelpCommand(roomId, event, this.client)
       }
