@@ -16,7 +16,7 @@ export interface Environment {
   LOG_LEVEL: LogLevel
   INVITE_ROOMS_LIST: GroupOfRooms[]
   USER_AUTH_PROVIDER: string
-  WELCOME_MESSAGE: string
+  WELCOME_MESSAGE_BASE64: string
 }
 
 /* By default, Joi expects all .env parameters as string
@@ -63,7 +63,7 @@ const environmentSchema = Joi.object<Environment>({
     .min(1)
     .required(),
   USER_AUTH_PROVIDER: Joi.string().required(),
-  WELCOME_MESSAGE: Joi.string().default(""),
+  WELCOME_MESSAGE_BASE64: Joi.string().default(""),
 })
 
 const { value, error } = environmentSchema.validate(process.env, { stripUnknown: true })

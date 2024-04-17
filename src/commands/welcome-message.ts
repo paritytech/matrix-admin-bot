@@ -6,6 +6,8 @@ import { CommandError, ensureDmRoom } from "src/utils"
 const moduleName = "WelcomeMessageCommand"
 export const WELCOME_MESSAGE_COMMAND = "welcome-message"
 
+const WELCOME_MESSAGE = Buffer.from(config.WELCOME_MESSAGE_BASE64, "base64").toString("utf-8")
+
 export enum Command {
   Show = "show",
   Send = "send",
@@ -22,13 +24,13 @@ export async function runWelcomeMessageCommand(
     throw new CommandError(`Invalid subcommand. Should be one of: ${Object.values(Command).join(", ")}`)
   }
 
-  if (!config.WELCOME_MESSAGE) {
+  if (!WELCOME_MESSAGE) {
     throw new CommandError("Welcome message is not configured")
   }
 
   // Show the welcome message
   if (command === Command.Show) {
-    await client.sendHtmlText(roomId, config.WELCOME_MESSAGE)
+    await client.sendHtmlText(roomId, WELCOME_MESSAGE)
     return
   }
 
@@ -44,7 +46,7 @@ export async function runWelcomeMessageCommand(
       )
     }
     const dmRoomId = await ensureDmRoom(client, targetUserId)
-    await client.sendHtmlText(dmRoomId, config.WELCOME_MESSAGE)
+    await client.sendHtmlText(dmRoomId, WELCOME_MESSAGE)
     LogService.info(moduleName, `Welcome message was sent to ${targetUserId} in DM`)
     await client.sendHtmlText(roomId, `Welcome message was sent to ${targetUserId} in DM`)
     return
