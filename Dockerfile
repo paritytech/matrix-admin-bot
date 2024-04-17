@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-slim
 
 # metadata
 ARG VCS_REF=master
@@ -18,8 +18,8 @@ LABEL io.parity.image.authors="cicd-team@parity.io" \
 WORKDIR /
 COPY . .
 
-RUN apk update && \
-    apk add --no-cache git && \
+RUN apt-get update && \
+    apt-get install -y git && \
     yarn --immutable && \
     yarn build
 
