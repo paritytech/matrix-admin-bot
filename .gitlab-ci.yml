@@ -20,7 +20,7 @@ variables:
   KUBE_NAMESPACE:                  "matrix-admin-bot"
   CI_REGISTRY:                     "docker.io/paritytech"
   GIT_STRATEGY:                    fetch
-  CI_IMAGE:                        "node:16.10-alpine"
+  CI_IMAGE:                        "node:18-alpine"
   # BUILDAH_IMAGE is defined in group variables
   BUILDAH_COMMAND:                 "buildah --storage-driver overlay2"
   DOCKERHUB_REPO:                  "paritytech"

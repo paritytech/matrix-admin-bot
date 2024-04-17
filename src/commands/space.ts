@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import htmlEscape from "escape-html"
 import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
@@ -5,7 +6,6 @@ import config from "src/config/env"
 import { CommandError, resolveRoomAlias, sendMessage } from "src/utils"
 
 import { adminApi } from "../admin-api"
-import { AxiosError } from "axios"
 import { RoomInfoShort } from "../admin-api/types"
 
 const moduleName = "SpaceCommand"
@@ -61,10 +61,12 @@ export async function runSpaceCommand(
 
 async function listSpace(roomId: string, client: MatrixClient, spaceRoomId: string) {
   const rooms = await adminApi.getRooms()
-  const roomsById = rooms.reduce((acc, x) => ({ ...acc, [x.room_id]: x }), {} as Record<string, RoomInfoShort>)
+  const roomsById = rooms.reduce((acc, x) => {
+    return { ...acc, [x.room_id]: x }
+  }, {} as Record<string, RoomInfoShort>)
   const space = roomsById[spaceRoomId]
   if (!space) {
-    return sendMessage(client, roomId, `Space not found`)
+    return await sendMessage(client, roomId, `Space not found`)
   }
   const spaceRoomState = await adminApi
     .getRoomState(space.room_id)

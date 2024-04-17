@@ -1,4 +1,4 @@
-import { MatrixClient } from "matrix-bot-sdk"
+import { MatrixClient, LogService, EncryptionAlgorithm } from "matrix-bot-sdk"
 import { nanoid } from "nanoid"
 
 import { adminApi } from "src/admin-api"
@@ -133,4 +133,99 @@ export async function resolveRoomAlias(client: MatrixClient, roomIdOrAlias: stri
     }
   }
   return roomId
+}
+
+export async function createDmRoom(client: MatrixClient, userId: string, encryption = false): Promise<string> {
+  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const currentDmRoomIds = (directEvent[userId] || []).filter(Boolean)
+
+  const roomId = await client.createRoom({
+    invite: [userId],
+    is_direct: true,
+    visibility: "private",
+    initial_state: encryption
+      ? [{ type: "m.room.encryption", state_key: "", content: { algorithm: EncryptionAlgorithm.MegolmV1AesSha2 } }]
+      : [],
+  })
+  LogService.info("utils", `Created a new DM room ${roomId} for user ${userId} (E2EE: ${encryption})`)
+
+  directEvent[userId] = [roomId].concat(currentDmRoomIds)
+  await client.setAccountData("m.direct", directEvent)
+  return roomId
+}
+
+export async function fixDms(client: MatrixClient, userId: string): Promise<void> {
+  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const currentRooms = (directEvent[userId] || []).filter(Boolean)
+  if (!currentRooms.length) return
+
+  const toKeep: string[] = []
+  for (const roomId of currentRooms) {
+    try {
+      const members = await client.getAllRoomMembers(roomId)
+      const joined = members.filter((m) => m.effectiveMembership === "join" || m.effectiveMembership === "invite")
+      if (joined.some((m) => m.membershipFor === userId)) {
+        toKeep.push(roomId)
+      }
+    } catch (e) {}
+  }
+
+  if (toKeep.length === currentRooms.length) return
+  directEvent[userId] = toKeep
+  await client.setAccountData("m.direct", directEvent)
+}
+
+export async function ensureEncryptedDmRoom(client: MatrixClient, userId: string): Promise<string | null> {
+  await fixDms(client, userId)
+  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const dmRoomIds = (directEvent[userId] || []).filter(Boolean)
+
+  for (const roomId of dmRoomIds) {
+    const events = await client.getRoomState(roomId)
+    const encryptionEvent = events.find((x) => x.type === "m.room.encryption")
+    if (!encryptionEvent) {
+      continue
+    }
+    const membershipEvent = events.find((x) => x.type === "m.room.member" && x.state_key === userId)
+    if (membershipEvent?.content?.membership === "join") {
+      return roomId
+    }
+    return null
+  }
+
+  await createDmRoom(client, userId, true)
+  return null
+}
+
+export async function ensureDmRoom(client: MatrixClient, userId: string): Promise<string> {
+  await fixDms(client, userId)
+  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const dmRoomIds = (directEvent[userId] || []).filter(Boolean)
+
+  for (const roomId of dmRoomIds) {
+    const events = await client.getRoomState(roomId)
+    const encryptionEvent = events.find((x) => x.type === "m.room.encryption")
+    const membershipEvent = events.find((x) => x.type === "m.room.member" && x.state_key === userId)
+    if (encryptionEvent && membershipEvent?.content?.membership === "join") {
+      return roomId
+    }
+  }
+
+  const roomId = await createDmRoom(client, userId, false)
+  return roomId
+}
+
+export function usernameToLocalpart(username: string): string {
+  return username.replace(/^@/, "").replace(new RegExp(`:${config.MATRIX_SERVER_DOMAIN}$`), "")
+}
+
+export function localpartToUserId(localpart: string): string {
+  let result = localpart
+  if (!result.startsWith("@")) {
+    result = `@${result}`
+  }
+  if (!result.endsWith(`:${config.MATRIX_SERVER_DOMAIN}`)) {
+    result += `:${config.MATRIX_SERVER_DOMAIN}`
+  }
+  return result
 }
