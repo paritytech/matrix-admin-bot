@@ -20,7 +20,7 @@ variables:
   KUBE_NAMESPACE:                  "matrix-admin-bot"
   CI_REGISTRY:                     "docker.io/paritytech"
   GIT_STRATEGY:                    fetch
-  CI_IMAGE:                        "node:18-alpine"
+  CI_IMAGE:                        "node:18-slim"
   # BUILDAH_IMAGE is defined in group variables
   BUILDAH_COMMAND:                 "buildah --storage-driver overlay2"
   DOCKERHUB_REPO:                  "paritytech"
@@ -96,7 +96,7 @@ check-linting:
   <<:                              *common-refs
   <<:                              *kubernetes-env
   script:
-    - apk update && apk add --no-cache git
+    - apt-get update && apt-get install -y git
     - yarn --immutable
     - yarn lint
 
