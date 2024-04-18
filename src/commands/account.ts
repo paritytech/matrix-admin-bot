@@ -1,3 +1,5 @@
+import * as crypto from "crypto"
+
 import axios from "axios"
 import { LogService, MatrixClient, MessageEvent, MessageEventContent } from "matrix-bot-sdk"
 
@@ -20,16 +22,11 @@ export enum Command {
 type OAuth2Session = {
   id: string
   state: "ACTIVE" | "FINISHED"
+  scope: string
   createdAt: string
   finishedAt: string
   lastActiveAt: string
 }
-
-const OAUTH2_SESSION_SCOPE = [
-  "urn:matrix:org.matrix.msc2967.client:device:*",
-  "urn:matrix:org.matrix.msc2967.client:api:*",
-  "email",
-].join(" ")
 
 export async function runAccountCommand(
   roomId: string,
@@ -95,11 +92,12 @@ export async function runAccountCommand(
     }
 
     const sessionDetails = await createOauth2Session(userDetails.id, permanent)
-    const { accessToken, refreshToken } = sessionDetails
+    const { accessToken, refreshToken, deviceId } = sessionDetails
     await client.sendHtmlText(
       dmRoomId,
       [
         `For the account with ID ${userId}, here are your token details:`,
+        `Device ID: <code>${deviceId}</code>`,
         `Access token: <code>${accessToken}</code>`,
         refreshToken ? `Refresh token: <code>${refreshToken}</code>` : null,
       ]
@@ -125,10 +123,14 @@ export async function runAccountCommand(
       .map((x) => {
         const createdAt = new Date(x.createdAt).toISOString()
         const lastActiveAt = x.lastActiveAt ? new Date(x.createdAt).toISOString() : "N/A"
-        return `${x.id}, ${createdAt}, ${lastActiveAt}`
+        const scope = x.scope || "N/A"
+        return `${x.id}, ${createdAt}, ${lastActiveAt}, ${scope}`
       })
       .join("\n")
-    await client.sendHtmlText(roomId, `Active sessions (ID, CreatedAt, LastActiveAt):<br/><br/><pre>${entries}</pre>`)
+    await client.sendHtmlText(
+      roomId,
+      `Active sessions (ID, CreatedAt, LastActiveAt, Scope):<br/><br/><pre>${entries}</pre>`,
+    )
   }
 
   // Sign out
@@ -261,7 +263,7 @@ async function getOrCreateUser(username: string): Promise<{ id: string; username
 async function createOauth2Session(
   userId: string,
   permanent: boolean,
-): Promise<{ sessionId: string; accessToken: string; refreshToken?: string }> {
+): Promise<{ sessionId: string; accessToken: string; refreshToken?: string; deviceId: string }> {
   type Response = {
     data: {
       createOauth2Session: {
@@ -275,6 +277,8 @@ async function createOauth2Session(
       }
     } | null
   }
+  const deviceId = generateDeviceId()
+  const scope = getOAuth2SessionScope(deviceId)
   try {
     const res = await makeGraphqlRequest<Response>(
       `
@@ -290,12 +294,13 @@ async function createOauth2Session(
             }
           }
       `,
-      { input: { scope: OAUTH2_SESSION_SCOPE, userId, permanent } },
+      { input: { scope, userId, permanent } },
     )
     if (!res.data) {
       throw new CommandError("Empty response")
     }
     return {
+      deviceId: deviceId,
       sessionId: res.data.createOauth2Session.oauth2Session.id,
       accessToken: res.data.createOauth2Session.accessToken,
       refreshToken: res.data.createOauth2Session.refreshToken,
@@ -336,6 +341,7 @@ async function getOauth2Sessions(userId: string): Promise<OAuth2Session[]> {
                 nodes {
                   id
                   state
+                  scope
                   client {
                     clientId
                     clientName
@@ -416,4 +422,22 @@ async function makeGraphqlRequest<T>(query: string, variables: Record<string, un
     { headers: { Authorization: `Bearer ${config.ACCESS_TOKEN}` } },
   )
   return response.data
+}
+
+function getOAuth2SessionScope(deviceId: string = "*"): string {
+  return [
+    `urn:matrix:org.matrix.msc2967.client:device:${deviceId}`,
+    `urn:matrix:org.matrix.msc2967.client:api:*`,
+    "email",
+  ].join(" ")
+}
+
+function generateDeviceId(length: number = 16): string {
+  return (
+    "device_" +
+    crypto
+      .randomBytes(Math.ceil(length / 2))
+      .toString("hex")
+      .slice(0, length)
+  )
 }

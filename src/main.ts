@@ -6,7 +6,9 @@ import {
   RustSdkCryptoStorageProvider,
   SimpleFsStorageProvider,
 } from "matrix-bot-sdk"
+import * as crypto from "crypto"
 import * as path from "path"
+import * as fs from "fs"
 
 import Bot from "./bot"
 import config from "./config/env"
@@ -23,9 +25,12 @@ LogService.info(moduleName, "Bot starting...")
 
 // This is the startup closure where we give ourselves an async context
 void (async () => {
+  // Prepare the storage
+  const storagePath = getBotStoragePath()
+
   // Prepare the storage system for the bot
-  const storage = new SimpleFsStorageProvider(path.join(config.DATA_PATH, "bot.json"))
-  const cryptoStorage = new RustSdkCryptoStorageProvider(path.join(config.DATA_PATH, "crypto"), 0)
+  const storage = new SimpleFsStorageProvider(path.join(storagePath, "bot.json"))
+  const cryptoStorage = new RustSdkCryptoStorageProvider(path.join(storagePath, "crypto"), 0)
 
   // Now create the client
   const client = new MatrixClient(config.MATRIX_SERVER_URL, config.ACCESS_TOKEN, storage, cryptoStorage)
@@ -50,3 +55,14 @@ void (async () => {
   LogService.error(moduleName, e)
   process.exit(1)
 })
+
+function getBotStoragePath() {
+  const storagePath = path.resolve(process.cwd(), config.DATA_PATH)
+  const hash = crypto.createHash("md5")
+  const accessTokenHash = hash.update(config.ACCESS_TOKEN).digest("hex")
+  const botStoragePath = path.join(storagePath, "bot-" + accessTokenHash)
+  if (!fs.existsSync(botStoragePath)) {
+    fs.mkdirSync(botStoragePath)
+  }
+  return botStoragePath
+}
