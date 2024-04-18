@@ -62,7 +62,8 @@ function getBotStoragePath() {
   const accessTokenHash = hash.update(config.ACCESS_TOKEN).digest("hex")
   const botStoragePath = path.join(storagePath, "bot-" + accessTokenHash)
   if (!fs.existsSync(botStoragePath)) {
-    fs.mkdirSync(botStoragePath)
+    LogService.info(moduleName, `Creating storage directory at ${botStoragePath}`)
+    fs.mkdirSync(botStoragePath, { recursive: true })
   }
   return botStoragePath
 }
