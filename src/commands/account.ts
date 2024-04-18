@@ -239,15 +239,15 @@ async function getOrCreateUser(username: string): Promise<{ id: string; username
   try {
     const res = await makeGraphqlRequest<Response>(
       `
-          mutation AddUser($input: AddUserInput!) {
-            addUser(input: $input) {
-              user {
-                id
-                username
-              }
-            }
+      mutation AddUser($input: AddUserInput!) {
+        addUser(input: $input) {
+          user {
+            id
+            username
           }
-        `,
+        }
+      }
+      `,
       { input: { username } },
     )
     if (!res.data) {
@@ -283,16 +283,16 @@ async function createOauth2Session(
     const res = await makeGraphqlRequest<Response>(
       `
       mutation CreateOauth2Session($input: CreateOAuth2SessionInput!) {
-            createOauth2Session (input: $input) {
-              accessToken
-              refreshToken
-              oauth2Session {
-                id
-                scope
-                state
-              }
-            }
+        createOauth2Session (input: $input) {
+          accessToken
+          refreshToken
+          oauth2Session {
+            id
+            scope
+            state
           }
+        }
+      }
       `,
       { input: { scope, userId, permanent } },
     )
@@ -334,33 +334,33 @@ async function getOauth2Sessions(userId: string): Promise<OAuth2Session[]> {
     while (hasNextPage) {
       const res: Response = await makeGraphqlRequest(
         `
-          query GetUserOAuth2Sessions($userId: ID!, $endCursor: String) {
-            user(id: $userId) {
-              id
-              oauth2Sessions(first: 100, after: $endCursor) {
-                nodes {
+        query GetUserOAuth2Sessions($userId: ID!, $endCursor: String) {
+          user(id: $userId) {
+            id
+            oauth2Sessions(first: 100, after: $endCursor) {
+              nodes {
+                id
+                state
+                scope
+                client {
+                  clientId
+                  clientName
+                }
+                user {
                   id
-                  state
-                  scope
-                  client {
-                    clientId
-                    clientName
-                  }
-                  user {
-                    id
-                    username
-                  }
-                  lastActiveAt
-                  createdAt
-                  finishedAt
+                  username
                 }
-                pageInfo {
-                  endCursor
-                  hasNextPage
-                }
+                lastActiveAt
+                createdAt
+                finishedAt
+              }
+              pageInfo {
+                endCursor
+                hasNextPage
               }
             }
           }
+        }
         `,
         { userId, endCursor },
       )
@@ -395,15 +395,17 @@ async function endOauth2Session(sessionId: string): Promise<void> {
   }
   try {
     const res = await makeGraphqlRequest<Response>(
-      `mutation EndOAuth2Session($input: EndOAuth2SessionInput!) {
-      endOauth2Session(input: $input) {
-        oauth2Session {
-          id
-          state
+      `
+      mutation EndOAuth2Session($input: EndOAuth2SessionInput!) {
+        endOauth2Session(input: $input) {
+          oauth2Session {
+            id
+            state
+          }
+          status
         }
-        status
       }
-    }`,
+    `,
       { input: { oauth2SessionId: sessionId } },
     )
     if (!res.data) {
