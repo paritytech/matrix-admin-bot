@@ -40,12 +40,9 @@ export async function runAccountCommand(
     throw new CommandError(`Invalid subcommand. Should be one of: ${Object.values(Command).join(", ")}`)
   }
 
-  if (!config.MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL) {
-    throw new CommandError("MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL is not configured")
-  }
-
   // List bot accounts
   if (command === Command.List) {
+    validateMasConfiguration()
     const users = await adminApi.getUserAccounts()
     const bots = users.filter((x) => x.user_type === "bot")
     const entries = bots
@@ -67,6 +64,7 @@ export async function runAccountCommand(
 
   // Create a new account
   if (command === Command.Create || command === Command.SignIn) {
+    validateMasConfiguration()
     const user = await adminApi.getUserAccount(userId)
     if (command === Command.Create && user) {
       throw new CommandError(`User ${userId} already exists.`)
@@ -109,6 +107,7 @@ export async function runAccountCommand(
 
   // List active sessions
   if (command === Command.ListSessions) {
+    validateMasConfiguration()
     const user = await adminApi.getUserAccount(userId)
     if (!user) {
       throw new CommandError(`User ${userId} doesn't exist.`)
@@ -135,6 +134,7 @@ export async function runAccountCommand(
 
   // Sign out
   if (command === Command.SignOut) {
+    validateMasConfiguration()
     const user = await adminApi.getUserAccount(userId)
     if (!user) {
       throw new CommandError(`User ${userId} doesn't exist.`)
@@ -177,6 +177,9 @@ export async function runAccountCommand(
   if (command === Command.AcceptInvitation) {
     const targetRoomIdOrAlias = extraArgs[0]
     const useStandardAuth = extraArgs[1] === "standard-auth"
+    if (!useStandardAuth) {
+      validateMasConfiguration()
+    }
     if (!targetRoomIdOrAlias || !targetRoomIdOrAlias.includes(`:${config.MATRIX_SERVER_DOMAIN}`)) {
       const [, wrongHomeServer] = targetRoomIdOrAlias.split(":")
       throw new CommandError(
@@ -222,6 +225,12 @@ export async function runAccountCommand(
         await endOauth2Session(sessionId!)
       }
     }
+  }
+}
+
+function validateMasConfiguration(): void {
+  if (!config.MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL) {
+    throw new CommandError("MATRIX_AUTHENTICATION_SERVICE_GRAPHQL_URL is not configured")
   }
 }
 
