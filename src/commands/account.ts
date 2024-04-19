@@ -429,7 +429,7 @@ async function makeGraphqlRequest<T>(query: string, variables: Record<string, un
 function getOAuth2SessionScope(deviceId: string = "*"): string {
   return [
     `urn:matrix:org.matrix.msc2967.client:device:${deviceId}`,
-    `urn:matrix:org.matrix.msc2967.client:api:*`,
+    "urn:matrix:org.matrix.msc2967.client:api:*",
     "email",
   ].join(" ")
 }
