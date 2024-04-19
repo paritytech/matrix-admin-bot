@@ -132,14 +132,17 @@ ${commandPrefix} ${DEACTIVATE_USER_COMMAND} <userId> [recover]
 ${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.List}
     Lists all bot accounts on the server.
 
-${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.Create} <userId> [permanent]
-    Creates a bot account and a new OAuth2 session. By default an access and refresh tokens will be sent to a requester in the E2EE DM chat.
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.Create} <userId>
+    Creates a bot account
 
     <userId>     - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN} or just username
-    [permanent]    - (Optional) flag making the access token permanent
 
-${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.SignIn} <userId> [permanent]
-    Does the same as the create command, but for an existing account
+${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.SignIn} <userId> <permanent | refreshable> [deviceId]
+    Creates a new OAuth2 session. An access and refresh tokens, and device ID will be sent to a requester in the E2EE DM chat.
+
+    <userId>                    - Matrix user id @username:${config.MATRIX_SERVER_DOMAIN} or just username
+    <permanent | refreshable>   - Flag defining the token type
+    [deviceId]                  - (Optional) flag for creating a session for a specific device
 
 ${commandPrefix} ${ACCOUNT_COMMAND} ${AccountSubcommand.ListSessions} <userId>
     List all active OAuth2 sessions in the format: ID, CreatedAt, LastActiveAt.

@@ -63,12 +63,22 @@ export async function runAccountCommand(
   const userId = localpartToUserId(userLocalpart)
 
   // Create a new account
-  if (command === Command.Create || command === Command.SignIn) {
+  if (command === Command.Create) {
     validateMasConfiguration()
     const user = await adminApi.getUserAccount(userId)
-    if (command === Command.Create && user) {
+    if (user) {
       throw new CommandError(`User ${userId} already exists.`)
-    } else if (command === Command.SignIn && !user) {
+    }
+    await getOrCreateUser(userLocalpart)
+    await adminApi.markUserAsBot(userId)
+    await client.sendHtmlText(roomId, `Created a new account ${userId}.`)
+  }
+
+  // Sign in
+  if (command === Command.SignIn) {
+    validateMasConfiguration()
+    const user = await adminApi.getUserAccount(userId)
+    if (!user) {
       throw new CommandError(`User ${userId} doesn't exist.`)
     }
 
@@ -81,15 +91,15 @@ export async function runAccountCommand(
       return
     }
 
-    const permanent = extraArgs[0] === "permanent"
-    const userDetails = await getOrCreateUser(userLocalpart)
-
-    if (command === Command.Create) {
-      await adminApi.markUserAsBot(userId)
-      await client.sendHtmlText(roomId, `Created a new account for user ${userId}.`)
+    const permanentArg = extraArgs[0]
+    if (!permanentArg || !["permanent", "refreshable"].includes(permanentArg)) {
+      throw new CommandError(`Missing or invalid token type argument. Should be one of: permanent, refreshable`)
     }
+    const permanent = permanentArg === "permanent"
+    const deviceIdArg = extraArgs[1] || undefined
 
-    const sessionDetails = await createOauth2Session(userDetails.id, permanent)
+    const userDetails = await getOrCreateUser(userLocalpart)
+    const sessionDetails = await createOauth2Session(userDetails.id, permanent, deviceIdArg)
     const { accessToken, refreshToken, deviceId } = sessionDetails
     await client.sendHtmlText(
       dmRoomId,
@@ -272,6 +282,7 @@ async function getOrCreateUser(username: string): Promise<{ id: string; username
 async function createOauth2Session(
   userId: string,
   permanent: boolean,
+  _deviceId?: string,
 ): Promise<{ sessionId: string; accessToken: string; refreshToken?: string; deviceId: string }> {
   type Response = {
     data: {
@@ -286,7 +297,7 @@ async function createOauth2Session(
       }
     } | null
   }
-  const deviceId = generateDeviceId()
+  const deviceId = _deviceId || generateDeviceId()
   const scope = getOAuth2SessionScope(deviceId)
   try {
     const res = await makeGraphqlRequest<Response>(
