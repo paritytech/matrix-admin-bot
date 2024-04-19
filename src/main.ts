@@ -53,7 +53,7 @@ void (async () => {
   await client.start() // This blocks until the bot is stopped
 })().catch((e) => {
   LogService.error(moduleName, e)
-  process.exit(1)
+  // process.exit(1)
 })
 
 function getBotStoragePath() {
