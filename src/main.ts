@@ -58,7 +58,7 @@ void (async () => {
 })
 
 function getBotStoragePath() {
-  const storagePath = path.resolve(process.cwd(), config.DATA_PATH)
+  const storagePath = path.resolve(config.DATA_PATH)
   const hash = crypto.createHash("md5")
   const accessTokenHash = hash.update(config.ACCESS_TOKEN).digest("hex")
   const botStoragePath = path.join(storagePath, "bot-" + accessTokenHash)
