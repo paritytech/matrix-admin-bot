@@ -54,6 +54,7 @@ void (async () => {
 })().catch((e) => {
   LogService.error(moduleName, e)
   // process.exit(1)
+  setInterval(() => {}, 1e5)
 })
 
 function getBotStoragePath() {
