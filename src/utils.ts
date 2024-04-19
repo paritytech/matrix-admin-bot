@@ -136,7 +136,7 @@ export async function resolveRoomAlias(client: MatrixClient, roomIdOrAlias: stri
 }
 
 export async function createDmRoom(client: MatrixClient, userId: string, encryption = false): Promise<string> {
-  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const directEvent = await getAccountDataDirect(client)
   const currentDmRoomIds = (directEvent[userId] || []).filter(Boolean)
 
   const roomId = await client.createRoom({
@@ -154,30 +154,9 @@ export async function createDmRoom(client: MatrixClient, userId: string, encrypt
   return roomId
 }
 
-export async function fixDms(client: MatrixClient, userId: string): Promise<void> {
-  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
-  const currentRooms = (directEvent[userId] || []).filter(Boolean)
-  if (!currentRooms.length) return
-
-  const toKeep: string[] = []
-  for (const roomId of currentRooms) {
-    try {
-      const members = await client.getAllRoomMembers(roomId)
-      const joined = members.filter((m) => m.effectiveMembership === "join" || m.effectiveMembership === "invite")
-      if (joined.some((m) => m.membershipFor === userId)) {
-        toKeep.push(roomId)
-      }
-    } catch (e) {}
-  }
-
-  if (toKeep.length === currentRooms.length) return
-  directEvent[userId] = toKeep
-  await client.setAccountData("m.direct", directEvent)
-}
-
 export async function ensureEncryptedDmRoom(client: MatrixClient, userId: string): Promise<string | null> {
   await fixDms(client, userId)
-  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const directEvent = await getAccountDataDirect(client)
   const dmRoomIds = (directEvent[userId] || []).filter(Boolean)
 
   for (const roomId of dmRoomIds) {
@@ -199,7 +178,7 @@ export async function ensureEncryptedDmRoom(client: MatrixClient, userId: string
 
 export async function ensureDmRoom(client: MatrixClient, userId: string): Promise<string> {
   await fixDms(client, userId)
-  const directEvent = ((await client.getAccountData("m.direct")) || {}) as Record<string, string[]>
+  const directEvent = await getAccountDataDirect(client)
   const dmRoomIds = (directEvent[userId] || []).filter(Boolean)
 
   for (const roomId of dmRoomIds) {
@@ -228,4 +207,33 @@ export function localpartToUserId(localpart: string): string {
     result += `:${config.MATRIX_SERVER_DOMAIN}`
   }
   return result
+}
+
+async function fixDms(client: MatrixClient, userId: string): Promise<void> {
+  const directEvent = await getAccountDataDirect(client)
+  const currentRooms = (directEvent[userId] || []).filter(Boolean)
+  if (!currentRooms.length) return
+
+  const toKeep: string[] = []
+  for (const roomId of currentRooms) {
+    try {
+      const members = await client.getAllRoomMembers(roomId)
+      const joined = members.filter((m) => m.effectiveMembership === "join" || m.effectiveMembership === "invite")
+      if (joined.some((m) => m.membershipFor === userId)) {
+        toKeep.push(roomId)
+      }
+    } catch (e) {}
+  }
+
+  if (toKeep.length === currentRooms.length) return
+  directEvent[userId] = toKeep
+  await client.setAccountData("m.direct", directEvent)
+}
+
+async function getAccountDataDirect(client: MatrixClient): Promise<Record<string, string[]>> {
+  try {
+    return (await client.getAccountData("m.direct")) || {}
+  } catch (e) {
+    return {}
+  }
 }
