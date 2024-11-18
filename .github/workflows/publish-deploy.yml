@@ -6,7 +6,6 @@ on:
       - master
     tags:
       - v*
-      - stg-v*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -18,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  APP: "substrate-tip-bot"
+  APP: "matrix-admin-bot"
 
 jobs:
   set-variables:
