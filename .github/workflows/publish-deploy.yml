@@ -85,7 +85,7 @@ jobs:
           app_name: "${{ env.APP }}"
           app_packages: "common"
           argocd_server: ${{ env.ARGOCD_SERVER }}
-          teleport_token: ${{ env.APP }}
+          teleport_token: "matrix-admin"
           teleport_app_name: "argocd-stg"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
 
@@ -107,6 +107,6 @@ jobs:
           app_name: "${{ env.APP }}"
           app_packages: "common"
           argocd_server: ${{ env.ARGOCD_SERVER }}
-          teleport_token: ${{ env.APP }}
+          teleport_token: "matrix-admin"
           teleport_app_name: "argocd-prod"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
