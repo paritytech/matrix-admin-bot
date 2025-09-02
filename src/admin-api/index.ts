@@ -132,7 +132,7 @@ class AdminApi {
     do {
       const result = (await this.makeRequest(
         "GET",
-        `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false&order_by=creation_ts&dir=desc`,
+        `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false&order_by=creation_ts&dir=b`,
       )) as UserAccountsResponse
       users = users.concat(result.users)
       nextToken = result.next_token || null
