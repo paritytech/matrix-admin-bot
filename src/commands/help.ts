@@ -2,15 +2,21 @@ import htmlEscape from "escape-html"
 import { MatrixClient, MessageEvent, MessageEventContent, RichReply } from "matrix-bot-sdk"
 
 import { ACCOUNT_COMMAND, Command as AccountSubcommand } from "src/commands/account"
-import { WELCOME_MESSAGE_COMMAND, Command as WelcomeMessageSubcommand } from "src/commands/welcome-message"
 import { BULK_INVITE_COMMAND } from "src/commands/bulk-invite"
 import { DEACTIVATE_USER_COMMAND } from "src/commands/deactivate-user"
 import { DELETE_ROOM_COMMAND } from "src/commands/delete-room"
 import { defaultGroups, INVITE_COMMAND } from "src/commands/invite"
+import {
+  LIST_NEW_JOINERS_COMMAND,
+  LIST_NEW_JOINERS_DEFAULT_LIMIT,
+  LIST_NEW_JOINERS_MAX_LIMIT,
+  LIST_NEW_JOINERS_MIN_LIMIT,
+} from "src/commands/list-new-joiners"
 import { LIST_ROOMS_COMMAND } from "src/commands/list-rooms"
 import { LIST_SPACES_COMMAND } from "src/commands/list-spaces"
 import { PROMOTE_COMMAND } from "src/commands/promote"
 import { SPACE_COMMAND } from "src/commands/space"
+import { Command as WelcomeMessageSubcommand, WELCOME_MESSAGE_COMMAND } from "src/commands/welcome-message"
 import config from "src/config/env"
 import { groupedRooms } from "src/config/rooms"
 import { commandPrefix } from "src/constants"
@@ -34,6 +40,12 @@ ${commandPrefix} ${LIST_ROOMS_COMMAND} [<group>]
 
 ${commandPrefix} ${LIST_SPACES_COMMAND}
     Show the list of all rooms and spaces on the current server in CSV format
+
+--------------------------------------------------
+
+${commandPrefix} ${LIST_NEW_JOINERS_COMMAND} [<number>]
+    Show the last registered users on the server.
+    [<number>]  - (Optional) how many users to list. Default: ${LIST_NEW_JOINERS_DEFAULT_LIMIT}, Min: ${LIST_NEW_JOINERS_MIN_LIMIT}, Max: ${LIST_NEW_JOINERS_MAX_LIMIT}
 
 --------------------------------------------------
 

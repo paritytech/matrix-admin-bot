@@ -1,5 +1,6 @@
 import { LogService, MatrixClient, MatrixProfileInfo, MessageEvent, UserID } from "matrix-bot-sdk"
 
+import { LIST_NEW_JOINERS_COMMAND, runListNewJoinersCommand } from "src/commands/list-new-joiners"
 import { LIST_ROOMS_COMMAND, runListRoomsCommand } from "src/commands/list-rooms"
 import { LIST_SPACES_COMMAND, runListSpacesCommand } from "src/commands/list-spaces"
 import config from "src/config/env"
@@ -108,6 +109,8 @@ export default class Bot {
           return await runListRoomsCommand(roomId, event, this.client, args[1])
         case LIST_SPACES_COMMAND:
           return await runListSpacesCommand(roomId, event, this.client)
+        case LIST_NEW_JOINERS_COMMAND:
+          return await runListNewJoinersCommand(roomId, event, this.client, args)
         case PROMOTE_COMMAND:
           return await runPromoteCommand(roomId, event, args, this.client, this.userId)
         case DELETE_ROOM_COMMAND:

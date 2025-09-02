@@ -125,6 +125,22 @@ class AdminApi {
     return users
   }
 
+  async getNewUserAccounts(limit: number): Promise<UserAccountShort[]> {
+    let users: UserAccountShort[] = []
+    let nextToken: string | null = null
+    let total: number | null = null
+    do {
+      const result = (await this.makeRequest(
+        "GET",
+        `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false&order_by=creation_ts&dir=desc`,
+      )) as UserAccountsResponse
+      users = users.concat(result.users)
+      nextToken = result.next_token || null
+      total = result.total
+    } while (nextToken !== null || users.length < total)
+    return users
+  }
+
   async getRooms(): Promise<RoomInfoShort[]> {
     const limit = 50
     let rooms: RoomInfoShort[] = []
