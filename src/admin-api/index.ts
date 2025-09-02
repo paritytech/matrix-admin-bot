@@ -126,19 +126,11 @@ class AdminApi {
   }
 
   async getNewUserAccounts(limit: number): Promise<UserAccountShort[]> {
-    let users: UserAccountShort[] = []
-    let nextToken: string | null = null
-    let total: number | null = null
-    do {
-      const result = (await this.makeRequest(
-        "GET",
-        `/v2/users?limit=${limit}${nextToken ? `&from=${nextToken}` : ``}&guests=false&order_by=creation_ts&dir=b`,
-      )) as UserAccountsResponse
-      users = users.concat(result.users)
-      nextToken = result.next_token || null
-      total = result.total
-    } while (nextToken !== null || users.length < total)
-    return users
+    const result = (await this.makeRequest(
+      "GET",
+      `/v2/users?limit=${limit}&guests=false&order_by=creation_ts&dir=b`,
+    )) as UserAccountsResponse
+    return result.users
   }
 
   async getRooms(): Promise<RoomInfoShort[]> {
