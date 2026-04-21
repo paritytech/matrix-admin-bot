@@ -1,4 +1,4 @@
-name: Publish and deploy
+name: Build image
 
 on:
   push:
@@ -16,55 +16,20 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  APP: "matrix-admin-bot"
-
 jobs:
-  set-variables:
-    name: Set variables
-    runs-on: ubuntu-latest
-    outputs:
-      VERSION: ${{ steps.version.outputs.VERSION }}
-    steps:
-      - name: Define version
-        id: version
-        run: |
-          export COMMIT_SHA=${{ github.sha }}
-          export COMMIT_SHA_SHORT=${COMMIT_SHA:0:8}
-          export REF_NAME=${{ github.ref_name }}
-          export REF_SLUG=${REF_NAME//\//_}
-          echo "short sha: ${COMMIT_SHA_SHORT}  slug: ${REF_SLUG}"
-          if [[ ${REF_SLUG} == "master" ]]
-          then
-            export VERSION=${REF_SLUG}-${COMMIT_SHA_SHORT}
-            echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          else
-            export VERSION=${REF_SLUG}
-            echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          fi
-          echo "set VERSION=${VERSION}"
-  build_push_docker:
-    name: Build docker image
-    runs-on: ubuntu-latest
-    environment: master_n_tags
-    needs: [set-variables]
-    env:
-      VERSION: ${{ needs.set-variables.outputs.VERSION }}
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            docker.io/paritytech/matrix-admin-bot:${{ env.VERSION }}
-
+  build-manifest:
+    name: build images from manifest
+    uses: paritytech/ci-actions/.github/workflows/build-manifest.yaml@main
+    permissions:
+      id-token: write
+      contents: write
+    with:
+      push: ${{ github.event_name == 'push' }}
+      environment: ${{ github.event_name == 'push' && 'docker-publish' || null }}
+      registry: europe-docker.pkg.dev/parity-mgmt/matrix-admin-bot
+      images: |
+        matrix-admin-bot:
+          dockerfile: ./Dockerfile
+    secrets:
+      GCP_SA_GITHUB: ${{ secrets.GCP_SA_GITHUB }}
+      GCP_WIP_GITHUB: ${{ secrets.GCP_WIP_GITHUB }}
