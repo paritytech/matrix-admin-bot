@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM node:22.23-slim
 
 # metadata
 ARG VCS_REF=master
@@ -19,7 +19,7 @@ WORKDIR /
 COPY . .
 
 RUN apt-get update && \
-    apt-get install -y git && \
+    apt-get install -y ca-certificates git && \
     yarn --immutable && \
     yarn build
 
