@@ -12,7 +12,7 @@
     "bot"
   ],
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "main": "build/main.js",
   "scripts": {
